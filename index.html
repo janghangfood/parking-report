@@ -1,24 +1,765 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>주차위반 제보</title>
-  <link rel="stylesheet" href="style.css"/>
-</head>
-<body>
-  <h1>🚫 주차위반 제보</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f3f4f6" />
+    <title>주차위반 제보</title>
 
-  <input id="loc" placeholder="위치"/>
-  <input id="plate" placeholder="차량번호"/>
-  <input id="phone" placeholder="연락처(선택)"/>
-  <textarea id="note" placeholder="비고"></textarea>
-  <input id="img" type="file" accept="image/*" multiple/>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
 
-  <button onclick="submitReport()">제보하기</button>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <pre id="result"></pre>
+    <style>
+      :root {
+        --bg: #f3f4f6;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+        --radius: 24px;
+        --badge-danger: #ef4444;
+        --badge-danger-bg: rgba(239, 68, 68, 0.12);
+        --badge-ok: #16a34a;
+        --badge-ok-bg: rgba(22, 163, 74, 0.12);
+        --primary: #111827;
+      }
 
-  <script src="app.js"></script>
-</body>
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        color: var(--text);
+        -webkit-text-size-adjust: 100%;
+        touch-action: manipulation;
+        overflow-x: hidden;
+      }
+
+      body {
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      input, textarea, button {
+        font-size: 20px;
+        font-family: inherit;
+      }
+
+      .screen {
+        width: 100%;
+        margin: 0;
+        padding: 24px 24px calc(140px + env(safe-area-inset-bottom));
+      }
+
+      .heroTitle {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 34px;
+        font-weight: 900;
+        letter-spacing: -0.8px;
+        line-height: 1.3;
+        margin: 12px 0 24px;
+      }
+
+      .banner {
+        height: 200px;
+        border-radius: 28px;
+        overflow: hidden;
+        background:
+          radial-gradient(260px 170px at 18% 45%, rgba(34, 197, 94, 0.16) 0%, transparent 60%),
+          radial-gradient(320px 220px at 86% 28%, rgba(239, 68, 68, 0.18) 0%, transparent 62%),
+          linear-gradient(135deg, #ffffff 0%, #eef2ff 46%, #fff1f2 100%);
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+        padding: 26px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        gap: 14px;
+      }
+
+      .chips {
+        display: flex;
+        gap: 14px;
+        justify-content: space-between;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px 20px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.92);
+        border: 1px solid rgba(15, 23, 42, 0.10);
+        font-size: 17px;
+        font-weight: 800;
+        color: #334155;
+        backdrop-filter: blur(10px);
+        white-space: nowrap;
+      }
+
+      .sectionLabel {
+        margin: 36px 0 18px;
+        font-size: 20px;
+        font-weight: 900;
+        color: #334155;
+        letter-spacing: -0.5px;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 28px;
+        border: 1px solid rgba(15, 23, 42, 0.06);
+        box-shadow: var(--shadow);
+        padding: 30px;
+        margin-bottom: 24px;
+      }
+
+      .cardTop {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .cardTitle {
+        margin: 0;
+        font-size: 25px;
+        font-weight: 900;
+        letter-spacing: -0.6px;
+        line-height: 1.3;
+      }
+
+      .cardSub {
+        margin-top: 12px;
+        font-size: 18px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .badge {
+        padding: 12px 18px;
+        border-radius: 999px;
+        font-size: 16px;
+        font-weight: 800;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+
+      .badge.req {
+        color: var(--badge-danger);
+        background: var(--badge-danger-bg);
+        border-color: rgba(239, 68, 68, 0.18);
+      }
+
+      .badge.opt {
+        color: #64748b;
+        background: rgba(100, 116, 139, 0.10);
+        border-color: rgba(100, 116, 139, 0.15);
+      }
+
+      .inputWrap {
+        margin-top: 20px;
+      }
+
+      .input, .textarea {
+        width: 100%;
+        border: 1px solid rgba(15, 23, 42, 0.10);
+        background: #fff;
+        border-radius: 22px;
+        padding: 20px 20px;
+        outline: none;
+        color: var(--text);
+        line-height: 1.6;
+        font-size: 20px;
+      }
+
+      .input::placeholder, .textarea::placeholder {
+        color: #94a3b8;
+      }
+
+      .textarea {
+        min-height: 160px;
+        resize: vertical;
+        line-height: 1.8;
+      }
+
+      .input:focus, .textarea:focus {
+        border-color: rgba(15, 23, 42, 0.16);
+        box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.06);
+      }
+
+      .uploadRow {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+      }
+
+      .uploadInfo {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        flex: 1;
+      }
+
+      .uploadMain {
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1.4;
+      }
+
+      .uploadHint {
+        font-size: 17px;
+        color: var(--muted);
+        line-height: 1.6;
+      }
+
+      .uploadBtn {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: #fff;
+        color: #0f172a;
+        border-radius: 999px;
+        padding: 17px 24px;
+        font-weight: 800;
+        cursor: pointer;
+        white-space: nowrap;
+        font-size: 18px;
+        flex-shrink: 0;
+        transition: all 0.2s;
+      }
+
+      .uploadBtn:active {
+        background: #f8fafc;
+      }
+
+      .previews {
+        margin-top: 20px;
+        display: flex;
+        gap: 16px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .previews::-webkit-scrollbar {
+        display: none;
+      }
+
+      .thumb {
+        width: 150px;
+        height: 150px;
+        border-radius: 24px;
+        overflow: hidden;
+        border: 1px solid rgba(15, 23, 42, 0.10);
+        background: #fff;
+        position: relative;
+        flex: 0 0 auto;
+      }
+
+      .thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .thumb button {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.80);
+        color: #fff;
+        font-weight: 800;
+        cursor: pointer;
+        font-size: 24px;
+        line-height: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .consentBox {
+        margin-top: 20px;
+        display: flex;
+        gap: 18px;
+        align-items: flex-start;
+        background: #f8fafc;
+        border: 1px solid rgba(15, 23, 42, 0.08);
+        border-radius: 22px;
+        padding: 24px;
+      }
+
+      .consentBox input[type="checkbox"] {
+        margin-top: 4px;
+        width: 26px;
+        height: 26px;
+        flex-shrink: 0;
+        cursor: pointer;
+      }
+
+      .consentTitle {
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1.4;
+      }
+
+      .consentDesc {
+        margin-top: 12px;
+        font-size: 17px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .toast {
+        margin-top: 22px;
+        border-radius: 22px;
+        padding: 20px;
+        font-size: 18px;
+        border: 1px solid rgba(15, 23, 42, 0.10);
+        background: #fff;
+        line-height: 1.7;
+        font-weight: 500;
+      }
+
+      .toast.ok {
+        border-color: rgba(22, 163, 74, 0.22);
+        background: rgba(22, 163, 74, 0.08);
+        color: #15803d;
+      }
+
+      .toast.err {
+        border-color: rgba(239, 68, 68, 0.22);
+        background: rgba(239, 68, 68, 0.08);
+        color: #991b1b;
+      }
+
+      .note {
+        margin: 22px 0 0;
+        text-align: center;
+        font-size: 17px;
+        color: var(--muted);
+        line-height: 1.7;
+      }
+
+      .bottomBar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 18px 24px calc(18px + env(safe-area-inset-bottom));
+        background: rgba(243, 244, 246, 0.96);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-top: 1px solid rgba(15, 23, 42, 0.10);
+        z-index: 100;
+      }
+
+      .cta {
+        width: 100%;
+        border: none;
+        border-radius: 22px;
+        padding: 22px 20px;
+        font-weight: 800;
+        font-size: 21px;
+        letter-spacing: -0.5px;
+        cursor: pointer;
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+        transition: opacity 0.2s;
+      }
+
+      .cta:active:not(:disabled) {
+        opacity: 0.9;
+      }
+
+      .cta:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        box-shadow: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="screen">
+      <div id="root"></div>
+    </div>
+
+    <div class="bottomBar">
+      <button id="ctaBtn" class="cta" disabled>신고 제출</button>
+    </div>
+
+    <script>
+      (function disableZoom(){
+        document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, { passive:false });
+        document.addEventListener('gesturechange', function(e){ e.preventDefault(); }, { passive:false });
+        document.addEventListener('gestureend', function(e){ e.preventDefault(); }, { passive:false });
+        document.addEventListener('touchmove', function(e){
+          if (e.scale && e.scale !== 1) e.preventDefault();
+        }, { passive:false });
+      })();
+
+      // ✅ 여기에 네 Worker API 넣기
+      const WORKER_API = "https://dawn-frost-9b1a.wlasqqq.workers.dev/api/report";
+
+      const { useEffect, useMemo, useRef, useState } = React;
+
+      function App() {
+        const fileInputRef = useRef(null);
+
+        const [location, setLocation] = useState("");
+        const [plate, setPlate] = useState("");
+        const [phone, setPhone] = useState("");
+        const [note, setNote] = useState("");
+
+        const [files, setFiles] = useState([]);
+        const [previews, setPreviews] = useState([]);
+        const [agree, setAgree] = useState(false);
+
+        const [loading, setLoading] = useState(false);
+        const [toast, setToast] = useState(null);
+
+        useEffect(() => {
+          const next = files.map((f) => ({
+            id: f.name + "_" + f.size + "_" + f.lastModified,
+            url: URL.createObjectURL(f),
+          }));
+          setPreviews(next);
+          return () => next.forEach((p) => URL.revokeObjectURL(p.url));
+        }, [files]);
+
+        const canSubmit = useMemo(() => {
+          return location.trim() && plate.trim() && files.length > 0 && agree && !loading;
+        }, [location, plate, files, agree, loading]);
+
+        useEffect(() => {
+          const btn = document.getElementById("ctaBtn");
+          if (!btn) return;
+          btn.disabled = !canSubmit;
+          btn.textContent = loading ? "제출 중..." : "신고 제출";
+          btn.onclick = () => submit();
+        }, [canSubmit, loading, location, plate, files, agree, phone, note]);
+
+        function pickFiles() {
+          fileInputRef.current?.click();
+        }
+
+        function onFileChange(e) {
+          const picked = Array.from(e.target.files || []);
+          if (!picked.length) return;
+
+          setFiles((prev) => {
+            const map = new Map(prev.map((f) => [f.name + "_" + f.size + "_" + f.lastModified, f]));
+            for (const f of picked) {
+              const key = f.name + "_" + f.size + "_" + f.lastModified;
+              if (!map.has(key)) map.set(key, f);
+            }
+            return Array.from(map.values());
+          });
+
+          e.target.value = "";
+        }
+
+        function removeFile(idx) {
+          setFiles((prev) => {
+            const next = prev.slice();
+            next.splice(idx, 1);
+            return next;
+          });
+        }
+
+        function resetForm() {
+          setLocation("");
+          setPlate("");
+          setPhone("");
+          setNote("");
+          setFiles([]);
+          setAgree(false);
+          if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+
+        function fileToBase64(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+        }
+
+        async function submit() {
+          setToast(null);
+
+          if (!location.trim()) return setToast({ type: "err", msg: "위치를 입력해 주세요." });
+          if (!plate.trim()) return setToast({ type: "err", msg: "차량번호를 입력해 주세요." });
+          if (files.length < 1) return setToast({ type: "err", msg: "사진을 1장 이상 올려 주세요." });
+          if (!agree) return setToast({ type: "err", msg: "동의 체크가 필요합니다." });
+
+          setLoading(true);
+
+          try {
+            const images = [];
+            for (const f of files) images.push(await fileToBase64(f));
+
+            const ip = await fetch("https://api64.ipify.org?format=json")
+              .then((r) => r.json())
+              .then((j) => j.ip)
+              .catch(() => "-");
+
+            const res = await fetch(WORKER_API, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                location: location.trim(),
+                plate: plate.trim(),
+                phone: phone.trim(),
+                note: note.trim(),
+                images,
+                ip,
+              }),
+            });
+
+            const json = await res.json().catch(() => ({}));
+            if (!res.ok || json.ok === false) {
+              throw new Error(json.error || "서버 오류");
+            }
+
+            setToast({ type: "ok", msg: "접수 완료되었습니다. 감사합니다!" });
+            resetForm();
+          } catch (e) {
+            const msg = (e && (e.message || e.toString())) || "오류가 발생했습니다.";
+            setToast({ type: "err", msg: "제출 실패: " + msg });
+          } finally {
+            setLoading(false);
+          }
+        }
+
+        return React.createElement(
+          React.Fragment,
+          null,
+
+          React.createElement("div", { className: "heroTitle" }, "🚫 라이브더센텀 주차위반 제보"),
+
+          React.createElement(
+            "div",
+            { className: "banner" },
+            React.createElement(
+              "div",
+              { className: "chips" },
+              React.createElement("div", { className: "chip" }, "Live the Centum"),
+              React.createElement("div", { className: "chip" }, loading ? "업로드 중..." : "증거제보 접수")
+            )
+          ),
+
+          React.createElement("div", { className: "sectionLabel" }, "신고 내용"),
+
+          React.createElement(
+            "div",
+            { className: "card" },
+            React.createElement(
+              "div",
+              { className: "cardTop" },
+              React.createElement(
+                "div",
+                null,
+                React.createElement("h3", { className: "cardTitle" }, "📍 위치"),
+                React.createElement("div", { className: "cardSub" }, "동·층·구역을 구체적으로 입력해 주세요.")
+              ),
+              React.createElement("div", { className: "badge req" }, "필수")
+            ),
+            React.createElement(
+              "div",
+              { className: "inputWrap" },
+              React.createElement("input", {
+                className: "input",
+                value: location,
+                onChange: (e) => setLocation(e.target.value),
+                placeholder: "예: B동 1층 주차장 12번",
+              })
+            )
+          ),
+
+          React.createElement(
+            "div",
+            { className: "card" },
+            React.createElement(
+              "div",
+              { className: "cardTop" },
+              React.createElement(
+                "div",
+                null,
+                React.createElement("h3", { className: "cardTitle" }, "🚗 차량번호"),
+                React.createElement("div", { className: "cardSub" }, "번호판이 정확히 보이게 입력해 주세요.")
+              ),
+              React.createElement("div", { className: "badge req" }, "필수")
+            ),
+            React.createElement(
+              "div",
+              { className: "inputWrap" },
+              React.createElement("input", {
+                className: "input",
+                value: plate,
+                onChange: (e) => setPlate(e.target.value),
+                placeholder: "예: 12가3456",
+                autoCapitalize: "characters",
+              })
+            )
+          ),
+
+          React.createElement(
+            "div",
+            { className: "card" },
+            React.createElement(
+              "div",
+              { className: "cardTop" },
+              React.createElement(
+                "div",
+                null,
+                React.createElement("h3", { className: "cardTitle" }, "📸 사진"),
+                React.createElement("div", { className: "cardSub" }, "번호판과 주차 위치가 함께 보이게 촬영하면 좋아요.")
+              ),
+              React.createElement("div", { className: "badge req" }, "필수")
+            ),
+            React.createElement(
+              "div",
+              { className: "uploadRow" },
+              React.createElement(
+                "div",
+                { className: "uploadInfo" },
+                React.createElement(
+                  "div",
+                  { className: "uploadMain" },
+                  files.length ? `${files.length}장 업로드됨` : "사진을 올려 주세요"
+                ),
+                React.createElement("div", { className: "uploadHint" }, "여러 장 추가 가능합니다")
+              ),
+              React.createElement("button", { className: "uploadBtn", type: "button", onClick: pickFiles }, "사진 추가")
+            ),
+            React.createElement("input", {
+              ref: fileInputRef,
+              type: "file",
+              accept: "image/*",
+              multiple: true,
+              capture: "environment",
+              onChange: onFileChange,
+              style: { display: "none" },
+            }),
+            previews.length > 0 &&
+              React.createElement(
+                "div",
+                { className: "previews" },
+                previews.map((p, idx) =>
+                  React.createElement(
+                    "div",
+                    { className: "thumb", key: p.id },
+                    React.createElement("img", { src: p.url, alt: "preview" }),
+                    React.createElement("button", { type: "button", onClick: () => removeFile(idx) }, "×")
+                  )
+                )
+              )
+          ),
+
+          React.createElement("div", { className: "sectionLabel" }, "추가 정보 (선택)"),
+
+          React.createElement(
+            "div",
+            { className: "card" },
+            React.createElement(
+              "div",
+              { className: "cardTop" },
+              React.createElement(
+                "div",
+                null,
+                React.createElement("h3", { className: "cardTitle" }, "☎️ 연락처 · 비고"),
+                React.createElement("div", { className: "cardSub" }, "상습/반복 여부, 특이사항이 있으면 남겨주세요.")
+              ),
+              React.createElement("div", { className: "badge opt" }, "선택")
+            ),
+            React.createElement(
+              "div",
+              { className: "inputWrap" },
+              React.createElement("input", {
+                className: "input",
+                value: phone,
+                onChange: (e) => setPhone(e.target.value),
+                placeholder: "차량 연락처 (예: 010-1234-5678)",
+                inputMode: "tel",
+              })
+            ),
+            React.createElement("div", { style: { height: "14px" } }),
+            React.createElement("textarea", {
+              className: "textarea",
+              value: note,
+              onChange: (e) => setNote(e.target.value),
+              placeholder: "비고 (상습/반복 여부, 특이사항 등)",
+            })
+          ),
+
+          React.createElement(
+            "div",
+            { className: "card" },
+            React.createElement(
+              "div",
+              { className: "cardTop" },
+              React.createElement(
+                "div",
+                null,
+                React.createElement("h3", { className: "cardTitle" }, "동의"),
+                React.createElement("div", { className: "cardSub" }, "증거 제공 및 처리 동의가 필요합니다.")
+              ),
+              React.createElement("div", { className: "badge req" }, "필수")
+            ),
+            React.createElement(
+              "div",
+              { className: "consentBox" },
+              React.createElement("input", {
+                type: "checkbox",
+                checked: agree,
+                onChange: (e) => setAgree(e.target.checked),
+              }),
+              React.createElement(
+                "div",
+                null,
+                React.createElement("div", { className: "consentTitle" }, "증거 제공 및 처리 동의"),
+                React.createElement("div", { className: "consentDesc" }, "제보 정보는 주차 질서 확립 목적 범위 내에서만 처리됩니다.")
+              )
+            ),
+            toast &&
+              React.createElement(
+                "div",
+                { className: "toast " + (toast.type === "ok" ? "ok" : "err") },
+                toast.msg
+              ),
+            React.createElement("div", { className: "note" }, "긴급 통행 방해 등은 관리사무소 또는 관할 기관에 즉시 연락하세요.")
+          )
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+    </script>
+  </body>
 </html>
