@@ -32,12 +32,10 @@
         --badge-ok: #16a34a;
         --badge-ok-bg: rgba(22, 163, 74, 0.12);
         --primary: #111827;
+        --line: rgba(15, 23, 42, 0.10);
       }
 
-      * {
-        box-sizing: border-box;
-        -webkit-tap-highlight-color: transparent;
-      }
+      * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
       html, body {
         margin: 0;
@@ -50,20 +48,20 @@
         overflow-x: hidden;
       }
 
-      body {
-        overscroll-behavior: none;
-        -webkit-overflow-scrolling: touch;
-      }
+      body { overscroll-behavior: none; -webkit-overflow-scrolling: touch; }
 
-      input, textarea, button {
-        font-size: 20px;
+      input, textarea, button, select {
+        font-size: 18px;
         font-family: inherit;
       }
 
       .screen {
         width: 100%;
         margin: 0;
-        padding: 24px 24px calc(140px + env(safe-area-inset-bottom));
+        padding: 24px 24px calc(150px + env(safe-area-inset-bottom));
+        max-width: 920px;
+        margin-left: auto;
+        margin-right: auto;
       }
 
       .heroTitle {
@@ -73,8 +71,8 @@
         font-size: 34px;
         font-weight: 900;
         letter-spacing: -0.8px;
-        line-height: 1.3;
-        margin: 12px 0 24px;
+        line-height: 1.2;
+        margin: 12px 0 18px;
       }
 
       .banner {
@@ -98,29 +96,36 @@
         display: flex;
         gap: 14px;
         justify-content: space-between;
+        align-items: center;
       }
 
       .chip {
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        padding: 15px 20px;
+        padding: 14px 18px;
         border-radius: 999px;
         background: rgba(255,255,255,0.92);
         border: 1px solid rgba(15, 23, 42, 0.10);
-        font-size: 17px;
+        font-size: 16px;
         font-weight: 800;
         color: #334155;
         backdrop-filter: blur(10px);
         white-space: nowrap;
       }
 
+      .chipSmall {
+        font-size: 14px;
+        font-weight: 800;
+        color: #475569;
+      }
+
       .sectionLabel {
-        margin: 36px 0 18px;
-        font-size: 20px;
+        margin: 32px 0 16px;
+        font-size: 18px;
         font-weight: 900;
         color: #334155;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.4px;
       }
 
       .card {
@@ -128,37 +133,37 @@
         border-radius: 28px;
         border: 1px solid rgba(15, 23, 42, 0.06);
         box-shadow: var(--shadow);
-        padding: 30px;
-        margin-bottom: 24px;
+        padding: 26px;
+        margin-bottom: 18px;
       }
 
       .cardTop {
         display: flex;
         align-items: flex-start;
         justify-content: space-between;
-        gap: 18px;
+        gap: 12px;
       }
 
       .cardTitle {
         margin: 0;
-        font-size: 25px;
+        font-size: 20px;
         font-weight: 900;
-        letter-spacing: -0.6px;
-        line-height: 1.3;
+        letter-spacing: -0.5px;
+        line-height: 1.25;
       }
 
       .cardSub {
-        margin-top: 12px;
-        font-size: 18px;
+        margin-top: 10px;
+        font-size: 15px;
         color: var(--muted);
-        line-height: 1.7;
+        line-height: 1.6;
       }
 
       .badge {
-        padding: 12px 18px;
+        padding: 10px 14px;
         border-radius: 999px;
-        font-size: 16px;
-        font-weight: 800;
+        font-size: 14px;
+        font-weight: 900;
         border: 1px solid transparent;
         white-space: nowrap;
         flex-shrink: 0;
@@ -176,99 +181,104 @@
         border-color: rgba(100, 116, 139, 0.15);
       }
 
-      .inputWrap {
-        margin-top: 20px;
+      .grid2 {
+        margin-top: 18px;
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
       }
 
-      .input, .textarea {
+      @media (min-width: 720px) {
+        .grid2 { grid-template-columns: 1fr 1fr; }
+      }
+
+      .inputWrap { margin-top: 16px; }
+
+      .input, .textarea, .select {
         width: 100%;
-        border: 1px solid rgba(15, 23, 42, 0.10);
+        border: 1px solid var(--line);
         background: #fff;
-        border-radius: 22px;
-        padding: 20px 20px;
+        border-radius: 18px;
+        padding: 14px 14px;
         outline: none;
         color: var(--text);
-        line-height: 1.6;
-        font-size: 20px;
+        line-height: 1.5;
+        font-size: 16px;
       }
 
-      .input::placeholder, .textarea::placeholder {
-        color: #94a3b8;
-      }
+      .textarea { min-height: 120px; resize: vertical; }
 
-      .textarea {
-        min-height: 160px;
-        resize: vertical;
-        line-height: 1.8;
-      }
-
-      .input:focus, .textarea:focus {
-        border-color: rgba(15, 23, 42, 0.16);
+      .input:focus, .textarea:focus, .select:focus {
+        border-color: rgba(15, 23, 42, 0.18);
         box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.06);
       }
 
+      .row {
+        margin-top: 12px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        background: #fff;
+        color: #0f172a;
+        border-radius: 999px;
+        padding: 10px 12px;
+        font-weight: 900;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        user-select: none;
+      }
+
+      .pill.active {
+        background: rgba(15, 23, 42, 0.92);
+        color: #fff;
+        border-color: rgba(15, 23, 42, 0.92);
+      }
+
       .uploadRow {
-        margin-top: 20px;
+        margin-top: 16px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 18px;
+        gap: 14px;
       }
 
-      .uploadInfo {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        flex: 1;
-      }
-
-      .uploadMain {
-        font-size: 19px;
-        font-weight: 800;
-        line-height: 1.4;
-      }
-
-      .uploadHint {
-        font-size: 17px;
-        color: var(--muted);
-        line-height: 1.6;
-      }
+      .uploadInfo { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+      .uploadMain { font-size: 16px; font-weight: 900; }
+      .uploadHint { font-size: 14px; color: var(--muted); line-height: 1.5; }
 
       .uploadBtn {
         border: 1px solid rgba(15, 23, 42, 0.12);
         background: #fff;
         color: #0f172a;
         border-radius: 999px;
-        padding: 17px 24px;
-        font-weight: 800;
+        padding: 12px 14px;
+        font-weight: 900;
         cursor: pointer;
         white-space: nowrap;
-        font-size: 18px;
+        font-size: 14px;
         flex-shrink: 0;
-        transition: all 0.2s;
-      }
-
-      .uploadBtn:active {
-        background: #f8fafc;
       }
 
       .previews {
-        margin-top: 20px;
+        margin-top: 14px;
         display: flex;
-        gap: 16px;
+        gap: 12px;
         overflow-x: auto;
         padding-bottom: 4px;
         -webkit-overflow-scrolling: touch;
       }
 
-      .previews::-webkit-scrollbar {
-        display: none;
-      }
+      .previews::-webkit-scrollbar { display: none; }
 
       .thumb {
-        width: 150px;
-        height: 150px;
-        border-radius: 24px;
+        width: 140px;
+        height: 140px;
+        border-radius: 18px;
         overflow: hidden;
         border: 1px solid rgba(15, 23, 42, 0.10);
         background: #fff;
@@ -276,72 +286,57 @@
         flex: 0 0 auto;
       }
 
-      .thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
+      .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
       .thumb button {
         position: absolute;
-        top: 12px;
-        right: 12px;
-        width: 40px;
-        height: 40px;
+        top: 10px;
+        right: 10px;
+        width: 36px;
+        height: 36px;
         border: none;
         border-radius: 999px;
         background: rgba(15, 23, 42, 0.80);
         color: #fff;
-        font-weight: 800;
+        font-weight: 900;
         cursor: pointer;
-        font-size: 24px;
-        line-height: 1;
+        font-size: 20px;
         display: flex;
         align-items: center;
         justify-content: center;
       }
 
       .consentBox {
-        margin-top: 20px;
+        margin-top: 14px;
         display: flex;
-        gap: 18px;
+        gap: 14px;
         align-items: flex-start;
         background: #f8fafc;
         border: 1px solid rgba(15, 23, 42, 0.08);
-        border-radius: 22px;
-        padding: 24px;
+        border-radius: 18px;
+        padding: 16px;
       }
 
       .consentBox input[type="checkbox"] {
-        margin-top: 4px;
-        width: 26px;
-        height: 26px;
+        margin-top: 2px;
+        width: 22px;
+        height: 22px;
         flex-shrink: 0;
         cursor: pointer;
       }
 
-      .consentTitle {
-        font-size: 19px;
-        font-weight: 800;
-        line-height: 1.4;
-      }
-
-      .consentDesc {
-        margin-top: 12px;
-        font-size: 17px;
-        color: var(--muted);
-        line-height: 1.7;
-      }
+      .consentTitle { font-size: 15px; font-weight: 900; }
+      .consentDesc { margin-top: 8px; font-size: 14px; color: var(--muted); line-height: 1.6; }
 
       .toast {
-        margin-top: 22px;
-        border-radius: 22px;
-        padding: 20px;
-        font-size: 18px;
+        margin-top: 14px;
+        border-radius: 18px;
+        padding: 14px;
+        font-size: 14px;
         border: 1px solid rgba(15, 23, 42, 0.10);
         background: #fff;
-        line-height: 1.7;
-        font-weight: 500;
+        line-height: 1.6;
+        font-weight: 600;
       }
 
       .toast.ok {
@@ -357,11 +352,11 @@
       }
 
       .note {
-        margin: 22px 0 0;
+        margin: 14px 0 0;
         text-align: center;
-        font-size: 17px;
+        font-size: 13px;
         color: var(--muted);
-        line-height: 1.7;
+        line-height: 1.6;
       }
 
       .bottomBar {
@@ -369,7 +364,7 @@
         left: 0;
         right: 0;
         bottom: 0;
-        padding: 18px 24px calc(18px + env(safe-area-inset-bottom));
+        padding: 14px 18px calc(14px + env(safe-area-inset-bottom));
         background: rgba(243, 244, 246, 0.96);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
@@ -380,11 +375,11 @@
       .cta {
         width: 100%;
         border: none;
-        border-radius: 22px;
-        padding: 22px 20px;
-        font-weight: 800;
-        font-size: 21px;
-        letter-spacing: -0.5px;
+        border-radius: 18px;
+        padding: 16px 16px;
+        font-weight: 900;
+        font-size: 16px;
+        letter-spacing: -0.3px;
         cursor: pointer;
         background: var(--primary);
         color: #fff;
@@ -392,15 +387,8 @@
         transition: opacity 0.2s;
       }
 
-      .cta:active:not(:disabled) {
-        opacity: 0.9;
-      }
-
-      .cta:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-        box-shadow: none;
-      }
+      .cta:active:not(:disabled) { opacity: 0.9; }
+      .cta:disabled { opacity: 0.35; cursor: not-allowed; box-shadow: none; }
     </style>
   </head>
 
@@ -415,30 +403,76 @@
 
     <script>
       (function disableZoom(){
-        document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, { passive:false });
-        document.addEventListener('gesturechange', function(e){ e.preventDefault(); }, { passive:false });
-        document.addEventListener('gestureend', function(e){ e.preventDefault(); }, { passive:false });
+        document.addEventListener('gesturestart', (e)=>e.preventDefault(), { passive:false });
+        document.addEventListener('gesturechange', (e)=>e.preventDefault(), { passive:false });
+        document.addEventListener('gestureend', (e)=>e.preventDefault(), { passive:false });
         document.addEventListener('touchmove', function(e){
           if (e.scale && e.scale !== 1) e.preventDefault();
         }, { passive:false });
       })();
 
-      // ✅ 여기에 네 Worker API 넣기
+      // ✅ 네 Worker API (이미 너 주소로 세팅)
       const WORKER_API = "https://dawn-frost-9b1a.wlasqqq.workers.dev/api/report";
 
       const { useEffect, useMemo, useRef, useState } = React;
 
+      // ✅ (옵션) 사진 자동 압축/리사이즈: 업로드 속도 확 좋아짐
+      async function compressImage(file, maxW=1600, quality=0.82) {
+        const img = await new Promise((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = URL.createObjectURL(file);
+        });
+
+        const scale = Math.min(1, maxW / img.width);
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+
+        URL.revokeObjectURL(img.src);
+
+        const blob = await new Promise((res) => canvas.toBlob(res, "image/jpeg", quality));
+        const base64 = await new Promise((res, rej) => {
+          const r = new FileReader();
+          r.onload = () => res(r.result);
+          r.onerror = rej;
+          r.readAsDataURL(blob);
+        });
+        return base64;
+      }
+
       function App() {
         const fileInputRef = useRef(null);
 
+        // 필수/핵심
         const [location, setLocation] = useState("");
         const [plate, setPlate] = useState("");
+        const [agree, setAgree] = useState(false);
+
+        // 추가 항목(빠져있던 것들)
+        const [violationType, setViolationType] = useState("이중주차");
+        const [eventAt, setEventAt] = useState(() => {
+          const d = new Date();
+          const pad = (n)=>String(n).padStart(2,"0");
+          return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+        });
+        const [isRepeat, setIsRepeat] = useState("모름"); // 예/아니오/모름
+        const [vehicleInfo, setVehicleInfo] = useState(""); // 차종/색상 등
+        const [reporterName, setReporterName] = useState(""); // 선택: 닉네임
+
+        // 선택
         const [phone, setPhone] = useState("");
         const [note, setNote] = useState("");
 
+        // 사진
         const [files, setFiles] = useState([]);
         const [previews, setPreviews] = useState([]);
-        const [agree, setAgree] = useState(false);
 
         const [loading, setLoading] = useState(false);
         const [toast, setToast] = useState(null);
@@ -462,11 +496,9 @@
           btn.disabled = !canSubmit;
           btn.textContent = loading ? "제출 중..." : "신고 제출";
           btn.onclick = () => submit();
-        }, [canSubmit, loading, location, plate, files, agree, phone, note]);
+        }, [canSubmit, loading, location, plate, files, agree, phone, note, violationType, eventAt, isRepeat, vehicleInfo, reporterName]);
 
-        function pickFiles() {
-          fileInputRef.current?.click();
-        }
+        function pickFiles() { fileInputRef.current?.click(); }
 
         function onFileChange(e) {
           const picked = Array.from(e.target.files || []);
@@ -478,7 +510,7 @@
               const key = f.name + "_" + f.size + "_" + f.lastModified;
               if (!map.has(key)) map.set(key, f);
             }
-            return Array.from(map.values());
+            return Array.from(map.values()).slice(0, 8); // ✅ 최대 8장 제한
           });
 
           e.target.value = "";
@@ -499,16 +531,11 @@
           setNote("");
           setFiles([]);
           setAgree(false);
+          setVehicleInfo("");
+          setReporterName("");
+          setIsRepeat("모름");
+          setViolationType("이중주차");
           if (fileInputRef.current) fileInputRef.current.value = "";
-        }
-
-        function fileToBase64(file) {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
         }
 
         async function submit() {
@@ -522,31 +549,41 @@
           setLoading(true);
 
           try {
+            // ✅ 사진 압축하여 base64로 변환
             const images = [];
-            for (const f of files) images.push(await fileToBase64(f));
+            for (const f of files) {
+              images.push(await compressImage(f, 1600, 0.82));
+            }
 
             const ip = await fetch("https://api64.ipify.org?format=json")
               .then((r) => r.json())
               .then((j) => j.ip)
               .catch(() => "-");
 
+            const payload = {
+              location: location.trim(),
+              plate: plate.trim(),
+              phone: phone.trim(),
+              note: note.trim(),
+              images,
+              ip,
+              // 추가 항목
+              violationType,
+              eventAt,
+              isRepeat,
+              vehicleInfo: vehicleInfo.trim(),
+              reporterName: reporterName.trim(),
+              source: "github-pages",
+            };
+
             const res = await fetch(WORKER_API, {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                location: location.trim(),
-                plate: plate.trim(),
-                phone: phone.trim(),
-                note: note.trim(),
-                images,
-                ip,
-              }),
+              body: JSON.stringify(payload),
             });
 
             const json = await res.json().catch(() => ({}));
-            if (!res.ok || json.ok === false) {
-              throw new Error(json.error || "서버 오류");
-            }
+            if (!res.ok || json.ok === false) throw new Error(json.error || "서버 오류");
 
             setToast({ type: "ok", msg: "접수 완료되었습니다. 감사합니다!" });
             resetForm();
@@ -571,12 +608,13 @@
               "div",
               { className: "chips" },
               React.createElement("div", { className: "chip" }, "Live the Centum"),
-              React.createElement("div", { className: "chip" }, loading ? "업로드 중..." : "증거제보 접수")
+              React.createElement("div", { className: "chip chipSmall" }, loading ? "업로드 중..." : "증거제보 접수")
             )
           ),
 
           React.createElement("div", { className: "sectionLabel" }, "신고 내용"),
 
+          // 위치
           React.createElement(
             "div",
             { className: "card" },
@@ -598,11 +636,28 @@
                 className: "input",
                 value: location,
                 onChange: (e) => setLocation(e.target.value),
-                placeholder: "예: B동 1층 주차장 12번",
+                placeholder: "예: B동 1층 주차장 12번 / 지상 2층 203호 앞",
+              })
+            ),
+            React.createElement(
+              "div",
+              { className: "grid2" },
+              React.createElement("input", {
+                className: "input",
+                value: reporterName,
+                onChange: (e) => setReporterName(e.target.value),
+                placeholder: "제보자 닉네임(선택)",
+              }),
+              React.createElement("input", {
+                className: "input",
+                value: vehicleInfo,
+                onChange: (e) => setVehicleInfo(e.target.value),
+                placeholder: "차종/색상(선택) 예: 흰색 SUV",
               })
             )
           ),
 
+          // 차량번호
           React.createElement(
             "div",
             { className: "card" },
@@ -630,6 +685,65 @@
             )
           ),
 
+          // 유형/시간/반복여부 (빠졌던 항목)
+          React.createElement(
+            "div",
+            { className: "card" },
+            React.createElement(
+              "div",
+              { className: "cardTop" },
+              React.createElement(
+                "div",
+                null,
+                React.createElement("h3", { className: "cardTitle" }, "🧾 위반 정보"),
+                React.createElement("div", { className: "cardSub" }, "유형·발생시각·반복 여부를 남기면 처리에 도움이 돼요.")
+              ),
+              React.createElement("div", { className: "badge opt" }, "권장")
+            ),
+            React.createElement(
+              "div",
+              { className: "grid2" },
+              React.createElement(
+                "select",
+                {
+                  className: "select",
+                  value: violationType,
+                  onChange: (e) => setViolationType(e.target.value),
+                },
+                React.createElement("option", { value: "이중주차" }, "이중주차"),
+                React.createElement("option", { value: "소방/비상통로" }, "소방/비상통로"),
+                React.createElement("option", { value: "장애인구역" }, "장애인구역"),
+                React.createElement("option", { value: "횡단보도/교차로" }, "횡단보도/교차로"),
+                React.createElement("option", { value: "충전구역" }, "전기차 충전구역"),
+                React.createElement("option", { value: "기타" }, "기타")
+              ),
+              React.createElement("input", {
+                className: "input",
+                type: "datetime-local",
+                value: eventAt,
+                onChange: (e) => setEventAt(e.target.value),
+              })
+            ),
+            React.createElement(
+              "div",
+              { className: "row" },
+              ["예", "아니오", "모름"].map((v) =>
+                React.createElement(
+                  "div",
+                  {
+                    key: v,
+                    className: "pill " + (isRepeat === v ? "active" : ""),
+                    onClick: () => setIsRepeat(v),
+                    role: "button",
+                    tabIndex: 0,
+                  },
+                  "반복/상습: " + v
+                )
+              )
+            )
+          ),
+
+          // 사진
           React.createElement(
             "div",
             { className: "card" },
@@ -640,7 +754,7 @@
                 "div",
                 null,
                 React.createElement("h3", { className: "cardTitle" }, "📸 사진"),
-                React.createElement("div", { className: "cardSub" }, "번호판과 주차 위치가 함께 보이게 촬영하면 좋아요.")
+                React.createElement("div", { className: "cardSub" }, "번호판과 주차 위치가 함께 보이게 촬영하면 좋아요. (최대 8장)")
               ),
               React.createElement("div", { className: "badge req" }, "필수")
             ),
@@ -655,7 +769,7 @@
                   { className: "uploadMain" },
                   files.length ? `${files.length}장 업로드됨` : "사진을 올려 주세요"
                 ),
-                React.createElement("div", { className: "uploadHint" }, "여러 장 추가 가능합니다")
+                React.createElement("div", { className: "uploadHint" }, "휴대폰은 촬영/선택 모두 가능")
               ),
               React.createElement("button", { className: "uploadBtn", type: "button", onClick: pickFiles }, "사진 추가")
             ),
@@ -685,6 +799,7 @@
 
           React.createElement("div", { className: "sectionLabel" }, "추가 정보 (선택)"),
 
+          // 연락처/비고
           React.createElement(
             "div",
             { className: "card" },
@@ -695,7 +810,7 @@
                 "div",
                 null,
                 React.createElement("h3", { className: "cardTitle" }, "☎️ 연락처 · 비고"),
-                React.createElement("div", { className: "cardSub" }, "상습/반복 여부, 특이사항이 있으면 남겨주세요.")
+                React.createElement("div", { className: "cardSub" }, "차량 연락처, 상습/반복 여부, 특이사항 등을 남겨주세요.")
               ),
               React.createElement("div", { className: "badge opt" }, "선택")
             ),
@@ -706,19 +821,20 @@
                 className: "input",
                 value: phone,
                 onChange: (e) => setPhone(e.target.value),
-                placeholder: "차량 연락처 (예: 010-1234-5678)",
+                placeholder: "차량 연락처(선택) 예: 010-1234-5678",
                 inputMode: "tel",
               })
             ),
-            React.createElement("div", { style: { height: "14px" } }),
+            React.createElement("div", { style: { height: "10px" } }),
             React.createElement("textarea", {
               className: "textarea",
               value: note,
               onChange: (e) => setNote(e.target.value),
-              placeholder: "비고 (상습/반복 여부, 특이사항 등)",
+              placeholder: "비고(선택) 예: 30분 이상 방치 / 통행 방해 심함 / 반복적으로 같은 위치",
             })
           ),
 
+          // 동의
           React.createElement(
             "div",
             { className: "card" },
@@ -749,12 +865,8 @@
               )
             ),
             toast &&
-              React.createElement(
-                "div",
-                { className: "toast " + (toast.type === "ok" ? "ok" : "err") },
-                toast.msg
-              ),
-            React.createElement("div", { className: "note" }, "긴급 통행 방해 등은 관리사무소 또는 관할 기관에 즉시 연락하세요.")
+              React.createElement("div", { className: "toast " + (toast.type === "ok" ? "ok" : "err") }, toast.msg),
+            React.createElement("div", { className: "note" }, "긴급 통행 방해/위험 상황은 관리사무소 또는 관할 기관에 즉시 연락하세요.")
           )
         );
       }
