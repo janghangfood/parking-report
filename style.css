@@ -107,3 +107,4 @@ button {
 @supports (height: 100dvh) {
   body { min-height: 100dvh; }
 }
+.heroTitle span { display:inline-block; }
