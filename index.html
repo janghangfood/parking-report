@@ -599,7 +599,14 @@
           React.Fragment,
           null,
 
-          React.createElement("div", { className: "heroTitle" }, "🚫 라이브더센텀 주차위반 제보"),
+          React.createElement(
+          "div",
+          { className: "heroTitle" },
+          React.createElement("span", null, "🚫"),
+          React.createElement("span", null, "라이브더센텀"),
+          React.createElement("span", null, "주차위반 제보")
+        )
+
 
           React.createElement(
             "div",
