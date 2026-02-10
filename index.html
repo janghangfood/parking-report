@@ -7,10 +7,12 @@
   <meta name="theme-color" content="#dff1ff" />
   <title>라이브더센텀 주차위반 제보</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
+  <!-- React -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
@@ -19,20 +21,31 @@
       --card: rgba(255,255,255,.96);
       --text:#1f2937;
       --muted:#6b7280;
-      --primary:#2563eb;
-      --primarySoft:rgba(37,99,235,.12);
+      --line:rgba(31,41,55,.08);
+
+      /* primary (sky) */
+      --primary:#3b82f6;
+      --primary2:#2563eb;
+      --primarySoft:rgba(59,130,246,.14);
+
+      --sage:#22c55e;
       --danger:#ef4444;
       --success:#16a34a;
+
       --radius:22px;
       --shadow:0 14px 34px rgba(15,23,42,.08);
       --shadow2:0 10px 22px rgba(15,23,42,.06);
     }
+
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+
     html,body{
       min-height:100%;
       font-family:"Noto Sans KR",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
       color:var(--text);
       overflow-x:hidden;
+
+      /* 🌤 sky + clouds */
       background:
         radial-gradient(120px 60px at 20% 18%, rgba(255,255,255,.75) 0%, transparent 70%),
         radial-gradient(160px 80px at 70% 22%, rgba(255,255,255,.65) 0%, transparent 70%),
@@ -40,6 +53,10 @@
         radial-gradient(180px 90px at 86% 38%, rgba(255,255,255,.50) 0%, transparent 70%),
         linear-gradient(180deg, #dff1ff 0%, #edf7ff 35%, #f7fbff 60%, #ffffff 100%);
     }
+
+    /* disable zoom gestures (mobile) */
+    .no-zoom { touch-action: manipulation; }
+
     .screen{
       position:relative;
       z-index:1;
@@ -47,26 +64,73 @@
       max-width:640px;
       margin:0 auto;
     }
-    .header{ margin:14px 0 12px; }
+
+    /* 🏢 Apartment silhouette at bottom */
+    .apt-bg{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height:190px;
+      pointer-events:none;
+      z-index:0;
+      background: linear-gradient(to top, rgba(100,116,139,.18), rgba(100,116,139,.08), transparent);
+      mask-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'>\
+<rect x='0' y='135' width='120' height='165' rx='8'/>\
+<rect x='140' y='85' width='150' height='215' rx='10'/>\
+<rect x='320' y='155' width='110' height='145' rx='8'/>\
+<rect x='460' y='65' width='170' height='235' rx='12'/>\
+<rect x='660' y='105' width='140' height='195' rx='10'/>\
+<rect x='820' y='150' width='120' height='150' rx='8'/>\
+</svg>");
+      -webkit-mask-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'>\
+<rect x='0' y='135' width='120' height='165' rx='8'/>\
+<rect x='140' y='85' width='150' height='215' rx='10'/>\
+<rect x='320' y='155' width='110' height='145' rx='8'/>\
+<rect x='460' y='65' width='170' height='235' rx='12'/>\
+<rect x='660' y='105' width='140' height='195' rx='10'/>\
+<rect x='820' y='150' width='120' height='150' rx='8'/>\
+</svg>");
+      mask-size: cover;
+      -webkit-mask-size: cover;
+      mask-repeat: no-repeat;
+      -webkit-mask-repeat: no-repeat;
+      opacity:.95;
+    }
+
+    /* Header */
+    .header{ margin:14px 0 12px; text-align:left; }
     h1{ font-size:26px; font-weight:900; letter-spacing:-.6px; line-height:1.15; }
     .subtitle{ margin-top:6px; font-size:14px; color:var(--muted); font-weight:600; }
 
+    /* Banner */
     .banner{
       border-radius:24px;
       padding:18px;
       margin:14px 0 18px;
       background:
-        radial-gradient(420px 220px at 15% 40%, rgba(37,99,235,.14) 0%, transparent 60%),
-        radial-gradient(420px 260px at 85% 60%, rgba(22,163,74,.10) 0%, transparent 62%),
+        radial-gradient(420px 220px at 15% 40%, rgba(59,130,246,.16) 0%, transparent 60%),
+        radial-gradient(420px 260px at 85% 60%, rgba(34,197,94,.12) 0%, transparent 62%),
         linear-gradient(135deg, #ffffff 0%, #f2f8ff 52%, #f2fff9 100%);
       border:1px solid rgba(255,255,255,.72);
       box-shadow:var(--shadow);
       position:relative;
       overflow:hidden;
     }
+    .banner::after{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background:
+        radial-gradient(circle at 25% 35%, rgba(255,255,255,.55) 0%, transparent 55%),
+        radial-gradient(circle at 75% 65%, rgba(255,255,255,.45) 0%, transparent 55%);
+      pointer-events:none;
+    }
+    .banner-content{position:relative; z-index:1;}
     .banner-title{font-size:16px; font-weight:900; letter-spacing:-.3px;}
     .banner-desc{margin-top:6px; font-size:13px; color:var(--muted); font-weight:600;}
 
+    /* Section */
     .section{
       margin:18px 0 10px;
       font-size:15px;
@@ -83,10 +147,11 @@
       display:inline-flex;
       align-items:center;justify-content:center;
       border-radius:10px;
-      background:var(--primarySoft);
-      color:var(--primary);
+      background:rgba(59,130,246,.14);
+      color:var(--primary2);
     }
 
+    /* Card */
     .card{
       background:var(--card);
       backdrop-filter: blur(10px);
@@ -104,6 +169,15 @@
       gap:8px;
       letter-spacing:-.2px;
     }
+    .label-icon{
+      width:26px;height:26px;
+      display:inline-flex;
+      align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(34,197,94,.12);
+      color:#15803d;
+      font-size:16px;
+    }
     .hint{
       margin-top:8px;
       font-size:13px;
@@ -112,6 +186,7 @@
       line-height:1.45;
     }
 
+    /* Inputs */
     input[type="text"], textarea{
       width:100%;
       margin-top:12px;
@@ -119,27 +194,29 @@
       border-radius:16px;
       border:1.5px solid rgba(31,41,55,.10);
       background:rgba(255,255,255,.92);
-      font-size:16px;
+      font-size:16px; /* iOS zoom 방지 */
       color:var(--text);
       font-family:inherit;
       transition: border-color .15s ease, box-shadow .15s ease;
     }
+    input[type="text"]::placeholder, textarea::placeholder{ color:#9aa2b1; }
     input[type="text"]:focus, textarea:focus{
       outline:none;
-      border-color:rgba(37,99,235,.55);
-      box-shadow:0 0 0 4px rgba(37,99,235,.14);
+      border-color:rgba(59,130,246,.55);
+      box-shadow:0 0 0 4px rgba(59,130,246,.14);
       background:#fff;
     }
     textarea{ min-height:110px; resize:vertical; }
 
+    /* Buttons */
     .btn{
       width:100%;
       margin-top:14px;
       padding:14px 14px;
       border-radius:16px;
-      border:1.5px solid rgba(37,99,235,.28);
+      border:1.5px solid rgba(59,130,246,.28);
       background:rgba(255,255,255,.95);
-      color:var(--primary);
+      color:var(--primary2);
       font-weight:900;
       font-size:15px;
       cursor:pointer;
@@ -149,22 +226,28 @@
       justify-content:center;
       gap:6px;
     }
+    .btn:hover{
+      background:rgba(59,130,246,.08);
+      box-shadow:0 10px 22px rgba(15,23,42,.08);
+    }
     .btn:active{ transform:scale(.98); }
 
+    /* count pill */
     .photo-count{
       display:inline-flex;
       align-items:center;
       gap:6px;
       margin-top:10px;
       padding:8px 12px;
-      background:rgba(22,163,74,.10);
-      border:1.5px solid rgba(22,163,74,.14);
+      background:rgba(34,197,94,.12);
+      border:1.5px solid rgba(34,197,94,.18);
       border-radius:999px;
       font-size:12px;
       color:#166534;
       font-weight:900;
     }
 
+    /* Previews */
     .previews{
       display:flex;
       gap:10px;
@@ -174,13 +257,14 @@
       -webkit-overflow-scrolling:touch;
     }
     .previews::-webkit-scrollbar{ display:none; }
+
     .thumb{
       width:104px;height:104px;
       border-radius:18px;
       overflow:hidden;
       position:relative;
       flex-shrink:0;
-      border:2px solid rgba(37,99,235,.12);
+      border:2px solid rgba(59,130,246,.14);
       box-shadow:0 12px 24px rgba(15,23,42,.08);
       background:#fff;
     }
@@ -195,8 +279,13 @@
       color:#fff;
       font-size:18px;
       cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 18px rgba(239,68,68,.18);
     }
 
+    /* Checkbox */
     .checkbox-label{
       display:flex;
       align-items:flex-start;
@@ -207,10 +296,11 @@
     }
     input[type="checkbox"]{
       width:20px;height:20px;
-      accent-color:var(--primary);
+      accent-color:var(--primary2);
       margin-top:2px;
     }
 
+    /* Bottom CTA */
     .bottom{
       position:fixed;
       left:0; right:0; bottom:0;
@@ -238,6 +328,7 @@
       justify-content:center;
       gap:10px;
     }
+    .submit:not(:disabled):active{ transform:scale(.99); }
     .submit:disabled{
       opacity:.45;
       background:#cbd5e1;
@@ -245,6 +336,7 @@
       cursor:not-allowed;
     }
 
+    /* Toast */
     .toast{
       margin-top:10px;
       padding:12px 14px;
@@ -252,8 +344,8 @@
       font-size:14px;
       font-weight:900;
       text-align:center;
-      background:rgba(22,163,74,.10);
-      border:1.5px solid rgba(22,163,74,.16);
+      background:rgba(34,197,94,.10);
+      border:1.5px solid rgba(34,197,94,.16);
       color:#166534;
       white-space:pre-wrap;
       word-break:break-word;
@@ -264,6 +356,7 @@
       color:#991b1b;
     }
 
+    /* Spinner */
     .spinner{
       width:18px;height:18px;
       border:2px solid rgba(255,255,255,.35);
@@ -272,14 +365,23 @@
       animation: spin .7s linear infinite;
     }
     @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    @media (max-width:360px){
+      h1{ font-size:24px; }
+      .card{ padding:16px; }
+    }
+    @media (min-width:768px){
+      .screen{ padding:26px 22px calc(110px + env(safe-area-inset-bottom)); }
+    }
   </style>
 </head>
 
-<body>
+<body class="no-zoom">
+  <div class="apt-bg"></div>
   <div id="root"></div>
 
   <script>
-    // 1) 여기만 너 Worker 주소로 정확히 넣으면 됨
+    // ✅ 네 Cloudflare Worker API (정확한 주소로!)
     const API_URL = "https://dawn-frost-9b1a.wlalsqqq.workers.dev/api/report";
 
     const {useState, useRef, useMemo, useEffect} = React;
@@ -289,15 +391,15 @@
 
       const [location, setLocation] = useState("");
       const [plate, setPlate] = useState("");
-      const [phone, setPhone] = useState(""); // 선택
+      const [phone, setPhone] = useState(""); // ✅ 추가 (선택값)
       const [note, setNote] = useState("");
       const [files, setFiles] = useState([]);
       const [agree, setAgree] = useState(false);
-
       const [loading, setLoading] = useState(false);
       const [toast, setToast] = useState("");
       const [toastType, setToastType] = useState("success");
 
+      // objectURL 누수 방지
       const [previewUrls, setPreviewUrls] = useState([]);
       useEffect(() => {
         const urls = files.map(f => URL.createObjectURL(f));
@@ -314,6 +416,7 @@
         const picked = Array.from(e.target.files || []);
         if (!picked.length) return;
 
+        // 중복 방지 (name+size+lastModified)
         setFiles(prev => {
           const map = new Map(prev.map(f => [f.name+"_"+f.size+"_"+f.lastModified, f]));
           for (const f of picked) map.set(f.name+"_"+f.size+"_"+f.lastModified, f);
@@ -327,7 +430,7 @@
         setFiles(f => f.filter((_, i) => i !== idx));
       }
 
-      // 이미지 압축: 최대 1280px, jpeg 0.82
+      // ✅ 사진 용량 문제 방지: 자동 압축(최대 1280px, JPEG 0.82)
       async function fileToCompressedDataUrl(file, maxW = 1280, quality = 0.82) {
         const img = await new Promise((resolve, reject) => {
           const i = new Image();
@@ -338,7 +441,6 @@
 
         const w0 = img.naturalWidth || img.width;
         const h0 = img.naturalHeight || img.height;
-
         const scale = Math.min(1, maxW / w0);
         const w = Math.round(w0 * scale);
         const h = Math.round(h0 * scale);
@@ -346,12 +448,10 @@
         const canvas = document.createElement("canvas");
         canvas.width = w;
         canvas.height = h;
-
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, w, h);
 
         try { URL.revokeObjectURL(img.src); } catch {}
-
         return canvas.toDataURL("image/jpeg", quality);
       }
 
@@ -360,46 +460,37 @@
         setLoading(true);
 
         try {
-          // 압축된 base64 생성
           const images = [];
           for (const f of files) {
             images.push(await fileToCompressedDataUrl(f));
           }
 
-          const payload = {
-            location: location.trim(),
-            plate: plate.trim(),
-            phone: phone.trim(),
-            note: note.trim(),
-            images,
-            ip: "-" // 필요하면 Worker에서 붙이도록 바꿔도 됨
-          };
-
+          // ✅ Worker에 "순수 데이터"만 전송 (Worker가 {action,data}로 감싸 GAS로 전달)
           const res = await fetch(API_URL, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify(payload) // action/data 없이 "순수 데이터"만 보냄
+            body: JSON.stringify({
+              location: location.trim(),
+              plate: plate.trim(),
+              phone: phone.trim(), // 선택
+              note: note.trim(),
+              images,
+              ip: "-"
+            })
           });
 
-          const text = await res.text().catch(() => "");
-
-          // Worker는 디버그용으로 {ok, gasStatus, gasBody}를 주게 만들 예정
-          // JSON이 아니어도 원문을 보여줘서 원인 추적 가능
+          const text = await res.text().catch(()=> "");
           let parsed = null;
           try { parsed = JSON.parse(text); } catch {}
 
-          if (!res.ok) {
-            throw new Error(text || ("HTTP " + res.status));
-          }
-
-          // Worker 디버그 응답 기준
+          // Worker가 항상 200으로 줄 수도 있으니 ok 필드도 확인
+          if (!res.ok) throw new Error(text || ("HTTP " + res.status));
           if (parsed && parsed.ok === false) {
-            throw new Error("GAS 실패\n" + JSON.stringify(parsed, null, 2));
+            throw new Error("GAS/Worker 오류\n" + JSON.stringify(parsed, null, 2));
           }
 
           setToastType("success");
-          setToast("접수가 완료되었습니다.");
-
+          setToast("✅ 접수가 완료되었습니다. 감사합니다!");
           setLocation("");
           setPlate("");
           setPhone("");
@@ -407,10 +498,10 @@
           setFiles([]);
           setAgree(false);
 
-          setTimeout(() => setToast(""), 3500);
+          setTimeout(() => setToast(""), 3200);
         } catch (e) {
           setToastType("error");
-          setToast("제출 실패\n" + String(e && e.message ? e.message : e));
+          setToast("❌ 제출에 실패했습니다.\n" + String(e && e.message ? e.message : e));
         } finally {
           setLoading(false);
         }
@@ -418,23 +509,28 @@
 
       return React.createElement("div", {className: "screen"},
         React.createElement("div", {className: "header"},
-          React.createElement("h1", null, "라이브더센텀 주차위반 제보"),
-          React.createElement("div", {className: "subtitle"}, "위반 사실이 명확히 보이도록 사진을 첨부해 주세요.")
+          React.createElement("h1", null, "🚫 라이브더센텀 주차위반 제보"),
+          React.createElement("div", {className: "subtitle"}, "우리 단지의 안전한 주차 문화를 함께 만들어가요")
         ),
 
         React.createElement("div", {className: "banner"},
-          React.createElement("div", {className: "banner-title"}, "불법 주차 및 위반 사항 제보"),
-          React.createElement("div", {className: "banner-desc"}, "번호판과 주차 위치가 함께 보이게 촬영해 주세요.")
+          React.createElement("div", {className: "banner-content"},
+            React.createElement("div", {className: "banner-title"}, "불법 주차 및 위반 사항을 제보해 주세요"),
+            React.createElement("div", {className: "banner-desc"}, "위반 사실이 명확히 확인될 수 있도록 증거사진을 제출해 주시기 바랍니다.")
+          )
         ),
 
         React.createElement("div", {className: "section"},
-          React.createElement("span", {className: "section-icon"}, "1"),
+          React.createElement("span", {className: "section-icon"}, "📋"),
           "신고 내용"
         ),
 
         React.createElement("div", {className: "card"},
-          React.createElement("label", null, "위치"),
-          React.createElement("div", {className: "hint"}, "동·층·구역을 구체적으로 입력해 주세요."),
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📍"),
+            "위치"
+          ),
+          React.createElement("div", {className: "hint"}, "동·층·구역을 구체적으로 입력해 주세요"),
           React.createElement("input", {
             type: "text",
             value: location,
@@ -444,8 +540,11 @@
         ),
 
         React.createElement("div", {className: "card"},
-          React.createElement("label", null, "차량번호"),
-          React.createElement("div", {className: "hint"}, "차량번호를 입력해 주세요."),
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "🚗"),
+            "차량번호"
+          ),
+          React.createElement("div", {className: "hint"}, "차량번호를 입력해 주세요"),
           React.createElement("input", {
             type: "text",
             value: plate,
@@ -456,8 +555,11 @@
         ),
 
         React.createElement("div", {className: "card"},
-          React.createElement("label", null, "연락처 (선택)"),
-          React.createElement("div", {className: "hint"}, "필요 시 확인 연락용(선택)."),
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📞"),
+            "연락처 (선택)"
+          ),
+          React.createElement("div", {className: "hint"}, "필요 시 확인 연락을 드릴 수 있어요 (선택)"),
           React.createElement("input", {
             type: "text",
             value: phone,
@@ -467,10 +569,13 @@
         ),
 
         React.createElement("div", {className: "card"},
-          React.createElement("label", null, "사진"),
-          React.createElement("div", {className: "hint"}, "사진은 자동 압축되어 전송됩니다."),
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📸"),
+            "사진"
+          ),
+          React.createElement("div", {className: "hint"}, "번호판과 주차 위치가 함께 보이게 촬영해 주세요 (자동 압축 전송)"),
           files.length > 0 && React.createElement("div", {className: "photo-count"},
-            `사진 ${files.length}장 첨부됨`
+            `📎 사진 ${files.length}장 첨부됨`
           ),
 
           React.createElement("button", {
@@ -500,13 +605,16 @@
         ),
 
         React.createElement("div", {className: "section"},
-          React.createElement("span", {className: "section-icon"}, "2"),
+          React.createElement("span", {className: "section-icon"}, "📝"),
           "추가 정보"
         ),
 
         React.createElement("div", {className: "card"},
-          React.createElement("label", null, "비고 (선택)"),
-          React.createElement("div", {className: "hint"}, "상습/반복 여부, 특이사항이 있으면 남겨 주세요."),
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📝"),
+            "비고 (선택)"
+          ),
+          React.createElement("div", {className: "hint"}, "상습/반복 여부, 특이사항이 있으면 남겨 주세요"),
           React.createElement("textarea", {
             value: note,
             onChange: e => setNote(e.target.value),
@@ -524,7 +632,7 @@
             "증거 제공 및 처리에 동의합니다"
           ),
           React.createElement("div", {className: "hint", style: {marginTop: "10px"}},
-            `위치: ${location ? '입력됨' : '미입력'} | 차량번호: ${plate ? '입력됨' : '미입력'} | 사진: ${files.length}장 | 동의: ${agree ? '완료' : '필요'}`
+            `✓ 위치: ${location ? '입력됨' : '미입력'} | 차량번호: ${plate ? '입력됨' : '미입력'} | 사진: ${files.length}장 | 동의: ${agree ? '완료' : '필요'}`
           )
         ),
 
@@ -549,6 +657,18 @@
     }
 
     ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+  </script>
+
+  <script>
+    // iOS/모바일 핀치 줌 방지(필요시)
+    (function disableZoom(){
+      document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, { passive:false });
+      document.addEventListener('gesturechange', function(e){ e.preventDefault(); }, { passive:false });
+      document.addEventListener('gestureend', function(e){ e.preventDefault(); }, { passive:false });
+      document.addEventListener('touchmove', function(e){
+        if (e.scale && e.scale !== 1) e.preventDefault();
+      }, { passive:false });
+    })();
   </script>
 </body>
 </html>
