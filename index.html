@@ -488,7 +488,7 @@
           setAgree(false);
 
           setTimeout(() => setToast(""), 3000);
-        } catch (e) {
+        } } catch (e) {
           setToastType("error");
           setToast("❌ 제출에 실패했습니다. 잠시 후 다시 시도해주세요.");
         } finally {
