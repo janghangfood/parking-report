@@ -249,6 +249,12 @@
       color:#166534;
       font-weight:900;
     }
+    .photo-limit{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(15,23,42,.62);
+      font-weight:800;
+    }
 
     /* Previews */
     .previews{
@@ -450,6 +456,11 @@
     // ✅ 네 Cloudflare Worker API (정확한 주소로!)
     const API_URL = "https://dawn-frost-9b1a.wlalsqqq.workers.dev/api/report";
 
+    // ✅ 속도/안정화 설정
+    const MAX_PHOTOS = 5;       // 최대 사진 장수
+    const MAX_WIDTH = 1024;     // 압축 최대 폭 (기존 1280 → 1024)
+    const JPEG_QUALITY = 0.72;  // 압축 품질 (기존 0.82 → 0.72)
+
     const {useState, useRef, useMemo, useEffect} = React;
 
     function App() {
@@ -513,11 +524,11 @@
         const picked = Array.from(e.target.files || []);
         if (!picked.length) return;
 
-        // 중복 방지 (name+size+lastModified)
+        // 중복 방지 + 최대 장수 제한
         setFiles(prev => {
           const map = new Map(prev.map(f => [f.name+"_"+f.size+"_"+f.lastModified, f]));
           for (const f of picked) map.set(f.name+"_"+f.size+"_"+f.lastModified, f);
-          return Array.from(map.values());
+          return Array.from(map.values()).slice(0, MAX_PHOTOS);
         });
 
         e.target.value = "";
@@ -527,8 +538,8 @@
         setFiles(f => f.filter((_, i) => i !== idx));
       }
 
-      // ✅ 사진 용량 문제 방지: 자동 압축(최대 1280px, JPEG 0.82)
-      async function fileToCompressedDataUrl(file, maxW = 1280, quality = 0.82) {
+      // ✅ 사진 용량 문제 방지: 자동 압축(기본 1024px, JPEG 0.72)  + 빠르게
+      async function fileToCompressedDataUrl(file, maxW = MAX_WIDTH, quality = JPEG_QUALITY) {
         const img = await new Promise((resolve, reject) => {
           const i = new Image();
           i.onload = () => resolve(i);
@@ -557,10 +568,10 @@
         setLoading(true);
 
         try {
-          const images = [];
-          for (const f of files) {
-            images.push(await fileToCompressedDataUrl(f));
-          }
+          // ✅ 병렬 압축: 체감 속도 향상 (순차 for-await 제거)
+          const images = await Promise.all(
+            files.map(f => fileToCompressedDataUrl(f, MAX_WIDTH, JPEG_QUALITY))
+          );
 
           // ✅ Worker에 "순수 데이터"만 전송 (Worker가 {action,data}로 감싸 GAS로 전달)
           const res = await fetch(API_URL, {
@@ -670,9 +681,14 @@
             React.createElement("span", {className: "label-icon"}, "📸"),
             "사진"
           ),
-          React.createElement("div", {className: "hint"}, "번호판과 주차 위치가 함께 보이게 촬영해 주세요 (자동 압축 전송)"),
+          React.createElement("div", {className: "hint"},
+            `번호판과 주차 위치가 함께 보이게 촬영해 주세요 (자동 압축 전송 · 최대 ${MAX_PHOTOS}장)`
+          ),
           files.length > 0 && React.createElement("div", {className: "photo-count"},
             `📎 사진 ${files.length}장 첨부됨`
+          ),
+          React.createElement("div", {className:"photo-limit"},
+            `• 권장: ${MAX_WIDTH}px / 품질 ${JPEG_QUALITY}로 전송 (더 빠르게 접수됩니다)`
           ),
 
           React.createElement("button", {
@@ -715,7 +731,7 @@
           React.createElement("textarea", {
             value: note,
             onChange: e => setNote(e.target.value),
-            placeholder: "예: 통행 방해, 상습주차 등"
+            placeholder: "예: 3일 연속 같은 자리 주차, 통행 방해 등"
           })
         ),
 
