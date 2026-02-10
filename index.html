@@ -338,13 +338,27 @@
       gap: 12px;
       cursor: pointer;
       padding: 4px;
+      font-weight: 600;
     }
 
     input[type="checkbox"] {
-      width: 24px;
-      height: 24px;
+      width: 22px;
+      height: 22px;
       cursor: pointer;
       accent-color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .photo-count {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 6px 12px;
+      background: rgba(59, 130, 246, 0.2);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--primary);
+      font-weight: 600;
     }
 
     /* 하단 고정 버튼 */
@@ -646,6 +660,9 @@ function App() {
         React.createElement("span", {className: "label-icon"}, "📸"),
         "사진 첨부"
       ),
+      files.length > 0 && React.createElement("div", {className: "photo-count"},
+        `📎 ${files.length}장의 사진이 첨부되었습니다`
+      ),
       React.createElement("div", {className: "btn-row"},
         React.createElement("button", {className: "btn", onClick: () => pick("camera")},
           "📷 촬영하기"
@@ -663,7 +680,7 @@ function App() {
         onChange: onFiles,
         style: {display: "none"}
       }),
-      files.length > 0 && React.createElement("div", {className: "previews"},
+      React.createElement("div", {className: "previews"},
         files.map((f, i) =>
           React.createElement("div", {className: "thumb", key: i},
             React.createElement("img", {src: URL.createObjectURL(f)}),
@@ -692,7 +709,10 @@ function App() {
           checked: agree,
           onChange: e => setAgree(e.target.checked)
         }),
-        React.createElement("span", null, "증거 제공에 동의합니다")
+        "증거 제공에 동의합니다"
+      ),
+      React.createElement("div", {className: "hint", style: {marginTop: "12px"}},
+        `✓ 위치: ${location ? '입력됨' : '미입력'} | 차량번호: ${plate ? '입력됨' : '미입력'} | 사진: ${files.length}장 | 동의: ${agree ? '완료' : '필요'}`
       )
     ),
 
