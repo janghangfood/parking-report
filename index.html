@@ -465,13 +465,17 @@
           const res = await fetch(API_URL, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
+           body: JSON.stringify({
+            action: "report",
+            data: {
               location: location.trim(),
               plate: plate.trim(),
+              phone: phone.trim ? phone.trim() : "", // phone 쓰는 UI면
               note: note.trim(),
               images,
-              ip: "-" // 필요하면 워커에서 ip 주입
-            })
+              ip: "-"
+            }
+          })
           });
 
           if (!res.ok) {
