@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#f3f4f6" />
+  <meta name="theme-color" content="#0f172a" />
   <title>라이브더센텀 주차위반 제보</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
   <!-- React -->
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
@@ -18,87 +18,496 @@
 
   <style>
     :root {
-      --bg:#f3f4f6;
-      --card:#fff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --primary:#111827;
-      --danger:#ef4444;
-      --radius:22px;
-      --shadow:0 8px 20px rgba(15,23,42,.08);
+      --bg: #0f172a;
+      --bg-light: #1e293b;
+      --card: #1e293b;
+      --card-hover: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-dark: #2563eb;
+      --danger: #ef4444;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius: 20px;
+      --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      --glow: 0 0 20px rgba(59, 130, 246, 0.3);
     }
 
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-    body{
-      margin:0;background:var(--bg);
-      font-family:"Noto Sans KR",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
-      color:var(--text)
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      margin: 0;
+      padding: 0;
     }
 
-    .screen{padding:16px 16px calc(110px + env(safe-area-inset-bottom))}
-    h1{font-size:26px;margin:8px 0 14px;font-weight:900}
-
-    .banner{
-      height:120px;border-radius:22px;padding:16px;
-      background:linear-gradient(135deg,#eef2ff,#fff1f2);
-      box-shadow:var(--shadow);
-      display:flex;align-items:flex-end;justify-content:space-between
+    body {
+      margin: 0;
+      background: var(--bg);
+      font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      color: var(--text);
+      overflow-x: hidden;
     }
 
-    .chip{
-      background:#fff;border-radius:999px;
-      padding:10px 14px;font-weight:800;font-size:14px
+    /* 배경 그라디언트 효과 */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
     }
 
-    .section{margin:22px 0 12px;font-size:16px;font-weight:900}
-
-    .card{
-      background:var(--card);border-radius:22px;
-      padding:18px;margin-bottom:14px;box-shadow:var(--shadow)
+    .screen {
+      position: relative;
+      z-index: 1;
+      padding: 20px 16px calc(120px + env(safe-area-inset-bottom));
+      max-width: 600px;
+      margin: 0 auto;
     }
 
-    label{font-weight:800;font-size:16px}
-    .hint{font-size:13px;color:var(--muted);margin-top:6px}
-
-    input,textarea{
-      width:100%;margin-top:12px;
-      padding:14px;border-radius:16px;
-      border:1px solid #e5e7eb;
-      font-size:16px
+    /* 헤더 */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+      animation: fadeInDown 0.6s ease;
     }
 
-    textarea{min-height:110px}
-
-    .btn-row{display:flex;gap:10px;margin-top:14px}
-    .btn{
-      flex:1;padding:14px;border-radius:999px;
-      border:1px solid #d1d5db;
-      background:#fff;font-weight:800;font-size:15px
+    .header-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: inline-block;
+      animation: bounce 2s infinite;
     }
 
-    .previews{display:flex;gap:12px;margin-top:14px;overflow-x:auto}
-    .thumb{width:110px;height:110px;border-radius:18px;overflow:hidden;position:relative}
-    .thumb img{width:100%;height:100%;object-fit:cover}
-    .thumb button{
-      position:absolute;top:6px;right:6px;
-      width:32px;height:32px;border-radius:50%;
-      border:none;background:rgba(0,0,0,.7);color:#fff;font-size:20px
+    h1 {
+      font-size: 28px;
+      font-weight: 900;
+      margin: 0 0 8px;
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .bottom{
-      position:fixed;left:0;right:0;bottom:0;
-      padding:10px 14px calc(10px + env(safe-area-inset-bottom));
-      background:rgba(243,244,246,.96);border-top:1px solid #e5e7eb
+    .subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
-    .submit{
-      width:100%;padding:18px;border-radius:18px;
-      background:var(--primary);color:#fff;
-      font-size:18px;font-weight:900;border:none
+    /* 배너 */
+    .banner {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow), var(--glow);
+      position: relative;
+      overflow: hidden;
+      animation: fadeInUp 0.6s ease 0.1s backwards;
     }
 
-    .submit:disabled{opacity:.4}
-    .toast{margin-top:12px;font-size:14px}
+    .banner::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .banner-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .banner-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .banner-desc {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+
+    /* 섹션 */
+    .section {
+      margin: 32px 0 16px;
+      font-size: 18px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: fadeInLeft 0.6s ease;
+    }
+
+    .section-icon {
+      font-size: 24px;
+    }
+
+    /* 카드 */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(59, 130, 246, 0.1);
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.6s ease backwards;
+    }
+
+    .card:hover {
+      background: var(--card-hover);
+      border-color: rgba(59, 130, 246, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .card:nth-child(1) { animation-delay: 0.2s; }
+    .card:nth-child(2) { animation-delay: 0.25s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.35s; }
+    .card:nth-child(5) { animation-delay: 0.4s; }
+
+    label {
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+    }
+
+    .label-icon {
+      font-size: 20px;
+    }
+
+    .hint {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 500;
+    }
+
+    /* 입력 필드 */
+    input[type="text"],
+    textarea {
+      width: 100%;
+      margin-top: 12px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 2px solid rgba(59, 130, 246, 0.2);
+      background: var(--bg);
+      font-size: 16px;
+      color: var(--text);
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: var(--bg-light);
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+    }
+
+    input[type="text"]::placeholder,
+    textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    /* 버튼 */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 14px;
+      border-radius: 14px;
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    /* 사진 미리보기 */
+    .previews {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      overflow-x: auto;
+      padding: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .previews::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    .previews::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.5);
+      border-radius: 3px;
+    }
+
+    .thumb {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+      border: 2px solid rgba(59, 130, 246, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .thumb:hover {
+      border-color: var(--primary);
+      transform: scale(1.05);
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .thumb button {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(239, 68, 68, 0.9);
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb button:hover {
+      background: var(--danger);
+      transform: scale(1.1);
+    }
+
+    /* 체크박스 */
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    input[type="checkbox"] {
+      width: 24px;
+      height: 24px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    /* 하단 고정 버튼 */
+    .bottom {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 16px;
+      padding-bottom: calc(16px + env(safe-area-inset-bottom));
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(59, 130, 246, 0.2);
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+      z-index: 100;
+    }
+
+    .bottom-content {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .submit {
+      width: 100%;
+      padding: 18px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff;
+      font-size: 18px;
+      font-weight: 800;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit:not(:disabled):hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(59, 130, 246, 0.5);
+    }
+
+    .submit:not(:disabled):active {
+      transform: translateY(0);
+    }
+
+    .submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #475569;
+    }
+
+    /* 토스트 메시지 */
+    .toast {
+      margin-top: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: rgba(16, 185, 129, 0.2);
+      border: 1px solid var(--success);
+      color: var(--success);
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      animation: slideUp 0.3s ease;
+    }
+
+    .toast.error {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    /* 로딩 스피너 */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* 애니메이션 */
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* 반응형 */
+    @media (max-width: 360px) {
+      h1 {
+        font-size: 24px;
+      }
+      .banner {
+        padding: 20px;
+      }
+      .card {
+        padding: 16px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      .screen {
+        padding: 32px 24px calc(120px + env(safe-area-inset-bottom));
+      }
+    }
   </style>
 </head>
 
@@ -106,136 +515,198 @@
 <div id="root"></div>
 
 <script>
-/* ======================
-   ⚠️ 여기만 수정
-====================== */
 const API_URL = "https://dawn-frost-9b1a.wlasqqq.workers.dev/api/report";
 
-const {useState,useRef,useEffect,useMemo} = React;
+const {useState, useRef, useMemo} = React;
 
-function App(){
+function App() {
   const fileRef = useRef();
-  const [pickMode,setPickMode] = useState("camera");
+  const [pickMode, setPickMode] = useState("camera");
 
-  const [location,setLocation] = useState("");
-  const [plate,setPlate] = useState("");
-  const [note,setNote] = useState("");
-  const [files,setFiles] = useState([]);
-  const [agree,setAgree] = useState(false);
-  const [loading,setLoading] = useState(false);
-  const [toast,setToast] = useState("");
+  const [location, setLocation] = useState("");
+  const [plate, setPlate] = useState("");
+  const [note, setNote] = useState("");
+  const [files, setFiles] = useState([]);
+  const [agree, setAgree] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [toast, setToast] = useState("");
+  const [toastType, setToastType] = useState("success");
 
   const canSubmit = useMemo(
-    ()=>location && plate && files.length && agree && !loading,
-    [location,plate,files,agree,loading]
+    () => location && plate && files.length && agree && !loading,
+    [location, plate, files, agree, loading]
   );
 
-  function pick(mode){
+  function pick(mode) {
     setPickMode(mode);
     fileRef.current.click();
   }
 
-  function onFiles(e){
-    setFiles(prev=>[...prev,...Array.from(e.target.files)]);
-    e.target.value="";
+  function onFiles(e) {
+    setFiles(prev => [...prev, ...Array.from(e.target.files)]);
+    e.target.value = "";
   }
 
-  function remove(idx){
-    setFiles(f=>f.filter((_,i)=>i!==idx));
+  function remove(idx) {
+    setFiles(f => f.filter((_, i) => i !== idx));
   }
 
-  function toBase64(f){
-    return new Promise(r=>{
-      const fr=new FileReader();
-      fr.onload=()=>r(fr.result);
+  function toBase64(f) {
+    return new Promise(r => {
+      const fr = new FileReader();
+      fr.onload = () => r(fr.result);
       fr.readAsDataURL(f);
     });
   }
 
-  async function submit(){
-    setLoading(true);setToast("");
-    try{
-      const images=[];
-      for(const f of files) images.push(await toBase64(f));
+  async function submit() {
+    setLoading(true);
+    setToast("");
+    try {
+      const images = [];
+      for (const f of files) images.push(await toBase64(f));
 
-      await fetch(API_URL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          location,plate,note,images,
-          ip:"-"
+      await fetch(API_URL, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+          location,
+          plate,
+          note,
+          images,
+          ip: "-"
         })
       });
 
-      setToast("접수 완료되었습니다.");
-      setLocation("");setPlate("");setNote("");setFiles([]);setAgree(false);
-    }catch(e){
-      setToast("제출 실패");
-    }finally{
+      setToastType("success");
+      setToast("✅ 접수가 완료되었습니다!");
+      setLocation("");
+      setPlate("");
+      setNote("");
+      setFiles([]);
+      setAgree(false);
+      
+      setTimeout(() => setToast(""), 3000);
+    } catch (e) {
+      setToastType("error");
+      setToast("❌ 제출에 실패했습니다. 다시 시도해주세요.");
+    } finally {
       setLoading(false);
     }
   }
 
-  return (
-    React.createElement("div",{className:"screen"},
-      React.createElement("h1",null,"🚫 라이브더센텀 주차위반 제보"),
+  return React.createElement("div", {className: "screen"},
+    React.createElement("div", {className: "header"},
+      React.createElement("div", {className: "header-icon"}, "🚫"),
+      React.createElement("h1", null, "라이브더센텀 주차위반 제보"),
+      React.createElement("div", {className: "subtitle"}, "안전한 주차문화를 만들어갑니다")
+    ),
 
-      React.createElement("div",{className:"banner"},
-        React.createElement("div",{className:"chip"},"Live the Centum"),
-        React.createElement("div",{className:"chip"},"증거제보")
+    React.createElement("div", {className: "banner"},
+      React.createElement("div", {className: "banner-content"},
+        React.createElement("div", {className: "banner-title"}, "Live the Centum"),
+        React.createElement("div", {className: "banner-desc"}, "불법 주차 및 위반 사항을 제보해주세요")
+      )
+    ),
+
+    React.createElement("div", {className: "section"},
+      React.createElement("span", {className: "section-icon"}, "📋"),
+      "신고 내용"
+    ),
+
+    React.createElement("div", {className: "card"},
+      React.createElement("label", null,
+        React.createElement("span", {className: "label-icon"}, "📍"),
+        "위치"
       ),
+      React.createElement("div", {className: "hint"}, "동·층·구역을 구체적으로 입력해주세요"),
+      React.createElement("input", {
+        type: "text",
+        value: location,
+        onChange: e => setLocation(e.target.value),
+        placeholder: "예: 101동 B2층 A구역"
+      })
+    ),
 
-      React.createElement("div",{className:"section"},"신고 내용"),
-
-      React.createElement("div",{className:"card"},
-        React.createElement("label",null,"📍 위치"),
-        React.createElement("div",{className:"hint"},"동·층·구역을 구체적으로"),
-        React.createElement("input",{value:location,onChange:e=>setLocation(e.target.value)})
+    React.createElement("div", {className: "card"},
+      React.createElement("label", null,
+        React.createElement("span", {className: "label-icon"}, "🚗"),
+        "차량번호"
       ),
+      React.createElement("input", {
+        type: "text",
+        value: plate,
+        onChange: e => setPlate(e.target.value),
+        placeholder: "예: 12가3456"
+      })
+    ),
 
-      React.createElement("div",{className:"card"},
-        React.createElement("label",null,"🚗 차량번호"),
-        React.createElement("input",{value:plate,onChange:e=>setPlate(e.target.value)})
+    React.createElement("div", {className: "card"},
+      React.createElement("label", null,
+        React.createElement("span", {className: "label-icon"}, "📸"),
+        "사진 첨부"
       ),
-
-      React.createElement("div",{className:"card"},
-        React.createElement("label",null,"📸 사진"),
-        React.createElement("div",{className:"btn-row"},
-          React.createElement("button",{className:"btn",onClick:()=>pick("camera")},"촬영"),
-          React.createElement("button",{className:"btn",onClick:()=>pick("gallery")},"갤러리")
+      React.createElement("div", {className: "btn-row"},
+        React.createElement("button", {className: "btn", onClick: () => pick("camera")},
+          "📷 촬영하기"
         ),
-        React.createElement("input",{
-          ref:fileRef,type:"file",accept:"image/*",multiple:true,
-          capture: pickMode==="camera"?"environment":undefined,
-          onChange:onFiles,style:{display:"none"}
-        }),
-        React.createElement("div",{className:"previews"},
-          files.map((f,i)=>
-            React.createElement("div",{className:"thumb",key:i},
-              React.createElement("img",{src:URL.createObjectURL(f)}),
-              React.createElement("button",{onClick:()=>remove(i)},"×")
-            )
+        React.createElement("button", {className: "btn", onClick: () => pick("gallery")},
+          "🖼️ 갤러리"
+        )
+      ),
+      React.createElement("input", {
+        ref: fileRef,
+        type: "file",
+        accept: "image/*",
+        multiple: true,
+        capture: pickMode === "camera" ? "environment" : undefined,
+        onChange: onFiles,
+        style: {display: "none"}
+      }),
+      files.length > 0 && React.createElement("div", {className: "previews"},
+        files.map((f, i) =>
+          React.createElement("div", {className: "thumb", key: i},
+            React.createElement("img", {src: URL.createObjectURL(f)}),
+            React.createElement("button", {onClick: () => remove(i)}, "×")
           )
         )
-      ),
+      )
+    ),
 
-      React.createElement("div",{className:"card"},
-        React.createElement("label",null,"📝 비고"),
-        React.createElement("textarea",{value:note,onChange:e=>setNote(e.target.value)})
+    React.createElement("div", {className: "card"},
+      React.createElement("label", null,
+        React.createElement("span", {className: "label-icon"}, "📝"),
+        "비고 (선택사항)"
       ),
+      React.createElement("textarea", {
+        value: note,
+        onChange: e => setNote(e.target.value),
+        placeholder: "추가로 전달할 내용이 있다면 입력해주세요"
+      })
+    ),
 
-      React.createElement("div",{className:"card"},
-        React.createElement("label",null,
-          React.createElement("input",{type:"checkbox",checked:agree,onChange:e=>setAgree(e.target.checked)}),
-          " 증거 제공 동의"
-        )
-      ),
+    React.createElement("div", {className: "card"},
+      React.createElement("label", {className: "checkbox-label"},
+        React.createElement("input", {
+          type: "checkbox",
+          checked: agree,
+          onChange: e => setAgree(e.target.checked)
+        }),
+        React.createElement("span", null, "증거 제공에 동의합니다")
+      )
+    ),
 
-      React.createElement("div",{className:"bottom"},
-        React.createElement("button",{className:"submit",disabled:!canSubmit,onClick:submit},
-          loading?"제출 중...":"신고 제출"
+    React.createElement("div", {className: "bottom"},
+      React.createElement("div", {className: "bottom-content"},
+        React.createElement("button", {
+          className: "submit",
+          disabled: !canSubmit,
+          onClick: submit
+        },
+          loading && React.createElement("div", {className: "spinner"}),
+          loading ? "제출 중..." : "🚀 신고 제출하기"
         ),
-        toast && React.createElement("div",{className:"toast"},toast)
+        toast && React.createElement("div", {className: `toast ${toastType}`}, toast)
       )
     )
   );
