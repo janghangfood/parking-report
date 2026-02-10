@@ -1,303 +1,948 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-<title>라이브더센텀 주차위반 제보</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#dff1ff" />
+  <title>라이브더센텀 주차위반 제보</title>
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
 
-<style>
-/* ================= 기본 ================= */
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:"Noto Sans KR",system-ui,sans-serif;
-  background:#f1f5f9;
-  color:#1f2937;
-}
-.screen{max-width:640px;margin:0 auto;padding:18px 16px 120px}
+  <!-- React -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-/* ================= 카드 ================= */
-.card{
-  background:#fff;
-  border-radius:18px;
-  padding:16px;
-  margin-bottom:14px;
-  box-shadow:0 10px 24px rgba(15,23,42,.08)
-}
-label{font-weight:900;font-size:15px}
-.hint{font-size:13px;color:#64748b;margin-top:6px}
-.hint.multiline{white-space:pre-line}
+  <style>
+    :root{
+      --card: rgba(255,255,255,.96);
+      --text:#1f2937;
+      --muted:#6b7280;
+      --line:rgba(31,41,55,.08);
 
-input,textarea{
-  width:100%;
-  margin-top:10px;
-  padding:14px;
-  font-size:16px;
-  border-radius:14px;
-  border:1.5px solid #e5e7eb;
-}
-textarea{min-height:110px}
+      /* primary (sky) */
+      --primary:#3b82f6;
+      --primary2:#2563eb;
+      --primarySoft:rgba(59,130,246,.14);
 
-/* ================= 버튼 ================= */
-button{
-  width:100%;
-  padding:16px;
-  border-radius:16px;
-  border:none;
-  font-weight:900;
-  background:linear-gradient(135deg,#2563eb,#3b82f6);
-  color:#fff;
-}
-button:disabled{opacity:.4}
+      --sage:#22c55e;
+      --danger:#ef4444;
+      --success:#16a34a;
 
-/* ================= 사진 ================= */
-.previews{display:flex;gap:10px;margin-top:12px;overflow-x:auto}
-.thumb{width:100px;height:100px;border-radius:14px;overflow:hidden;position:relative}
-.thumb img{width:100%;height:100%;object-fit:cover}
-.thumb button{
-  position:absolute;top:6px;right:6px;
-  width:28px;height:28px;border-radius:50%;
-  background:#ef4444;color:#fff;border:none;
-}
+      --radius:22px;
+      --shadow:0 14px 34px rgba(15,23,42,.08);
+      --shadow2:0 10px 22px rgba(15,23,42,.06);
+    }
 
-/* ================= 하단 ================= */
-.bottom{
-  position:fixed;left:0;right:0;bottom:0;
-  padding:12px;background:#fff;border-top:1px solid #e5e7eb
-}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 
-/* ================= 모달 + 로딩바 ================= */
-.modal-backdrop{
-  position:fixed;inset:0;background:rgba(15,23,42,.4);
-  display:flex;align-items:center;justify-content:center;z-index:9999
-}
-.modal{
-  width:90%;max-width:420px;background:#fff;
-  border-radius:20px;padding:18px
-}
-.progress-wrap{
-  width:100%;height:10px;background:#e5e7eb;
-  border-radius:999px;margin-top:14px;overflow:hidden
-}
-.progress-bar{
-  height:100%;
-  background:linear-gradient(90deg,#60a5fa,#2563eb,#60a5fa);
-  background-size:200% 100%;
-  animation:move 1.2s linear infinite
-}
-@keyframes move{from{background-position:0%}to{background-position:200%}}
+    html,body{
+      min-height:100%;
+      font-family:"Noto Sans KR",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+      color:var(--text);
+      overflow-x:hidden;
 
-/* ================= PC 차단 ================= */
-.pc-wrap{
-  min-height:100vh;display:flex;align-items:center;justify-content:center
-}
-.pc-card{
-  background:#fff;padding:28px;border-radius:20px;
-  text-align:center;max-width:420px
-}
-.pc-toast{
-  position:fixed;top:16px;left:50%;
-  transform:translateX(-50%);
-  background:#111827;color:#fff;
-  padding:12px 16px;border-radius:12px;
-  font-weight:900;z-index:10000;
-  white-space:pre-line
-}
-</style>
+      /* 🌤 sky + clouds */
+      background:
+        radial-gradient(120px 60px at 20% 18%, rgba(255,255,255,.75) 0%, transparent 70%),
+        radial-gradient(160px 80px at 70% 22%, rgba(255,255,255,.65) 0%, transparent 70%),
+        radial-gradient(220px 110px at 45% 32%, rgba(255,255,255,.55) 0%, transparent 70%),
+        radial-gradient(180px 90px at 86% 38%, rgba(255,255,255,.50) 0%, transparent 70%),
+        linear-gradient(180deg, #dff1ff 0%, #edf7ff 35%, #f7fbff 60%, #ffffff 100%);
+    }
+
+    /* disable zoom gestures (mobile) */
+    .no-zoom { touch-action: manipulation; }
+
+    .screen{
+      position:relative;
+      z-index:1;
+      padding:18px 16px calc(118px + env(safe-area-inset-bottom));
+      max-width:640px;
+      margin:0 auto;
+    }
+
+    /* 🏢 Apartment silhouette at bottom */
+    .apt-bg{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      height:190px;
+      pointer-events:none;
+      z-index:0;
+      background: linear-gradient(to top, rgba(100,116,139,.18), rgba(100,116,139,.08), transparent);
+      mask-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'>\
+<rect x='0' y='135' width='120' height='165' rx='8'/>\
+<rect x='140' y='85' width='150' height='215' rx='10'/>\
+<rect x='320' y='155' width='110' height='145' rx='8'/>\
+<rect x='460' y='65' width='170' height='235' rx='12'/>\
+<rect x='660' y='105' width='140' height='195' rx='10'/>\
+<rect x='820' y='150' width='120' height='150' rx='8'/>\
+</svg>");
+      -webkit-mask-image: url("data:image/svg+xml;utf8,\
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1000 300'>\
+<rect x='0' y='135' width='120' height='165' rx='8'/>\
+<rect x='140' y='85' width='150' height='215' rx='10'/>\
+<rect x='320' y='155' width='110' height='145' rx='8'/>\
+<rect x='460' y='65' width='170' height='235' rx='12'/>\
+<rect x='660' y='105' width='140' height='195' rx='10'/>\
+<rect x='820' y='150' width='120' height='150' rx='8'/>\
+</svg>");
+      mask-size: cover;
+      -webkit-mask-size: cover;
+      mask-repeat: no-repeat;
+      -webkit-mask-repeat: no-repeat;
+      opacity:.95;
+    }
+
+    /* Header */
+    .header{ margin:14px 0 12px; text-align:left; }
+    h1{ font-size:26px; font-weight:900; letter-spacing:-.6px; line-height:1.15; }
+    .subtitle{ margin-top:6px; font-size:14px; color:var(--muted); font-weight:600; }
+
+    /* Banner */
+    .banner{
+      border-radius:24px;
+      padding:18px;
+      margin:14px 0 18px;
+      background:
+        radial-gradient(420px 220px at 15% 40%, rgba(59,130,246,.16) 0%, transparent 60%),
+        radial-gradient(420px 260px at 85% 60%, rgba(34,197,94,.12) 0%, transparent 62%),
+        linear-gradient(135deg, #ffffff 0%, #f2f8ff 52%, #f2fff9 100%);
+      border:1px solid rgba(255,255,255,.72);
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+      animation: floatIn .28s ease-out both;
+    }
+    .banner::after{
+      content:"";
+      position:absolute;
+      inset:-40px;
+      background:
+        radial-gradient(circle at 25% 35%, rgba(255,255,255,.55) 0%, transparent 55%),
+        radial-gradient(circle at 75% 65%, rgba(255,255,255,.45) 0%, transparent 55%);
+      pointer-events:none;
+    }
+    .banner-content{position:relative; z-index:1;}
+    .banner-title{font-size:16px; font-weight:900; letter-spacing:-.3px;}
+    .banner-desc{margin-top:6px; font-size:13px; color:var(--muted); font-weight:600;}
+
+    /* Section */
+    .section{
+      margin:18px 0 10px;
+      font-size:15px;
+      font-weight:900;
+      letter-spacing:-.2px;
+      color:#334155;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .section-icon{
+      font-size:18px;
+      width:26px;height:26px;
+      display:inline-flex;
+      align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(59,130,246,.14);
+      color:var(--primary2);
+    }
+
+    /* Card */
+    .card{
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border-radius:22px;
+      padding:18px;
+      margin-bottom:12px;
+      border:1px solid rgba(31,41,55,.06);
+      box-shadow:var(--shadow2);
+      animation: floatIn .28s ease-out both;
+      animation-delay: .02s;
+    }
+    label{
+      font-weight:900;
+      font-size:15px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      letter-spacing:-.2px;
+    }
+    .label-icon{
+      width:26px;height:26px;
+      display:inline-flex;
+      align-items:center;justify-content:center;
+      border-radius:10px;
+      background:rgba(34,197,94,.12);
+      color:#15803d;
+      font-size:16px;
+    }
+    .hint{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:600;
+      line-height:1.45;
+    }
+    .hint.multiline{ white-space: pre-line; }
+
+    /* Inputs */
+    input[type="text"], textarea{
+      width:100%;
+      margin-top:12px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1.5px solid rgba(31,41,55,.10);
+      background:rgba(255,255,255,.92);
+      font-size:16px; /* iOS zoom 방지 */
+      color:var(--text);
+      font-family:inherit;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    input[type="text"]::placeholder, textarea::placeholder{ color:#9aa2b1; }
+    input[type="text"]:focus, textarea:focus{
+      outline:none;
+      border-color:rgba(59,130,246,.55);
+      box-shadow:0 0 0 4px rgba(59,130,246,.14);
+      background:#fff;
+    }
+    textarea{ min-height:110px; resize:vertical; }
+
+    /* Buttons */
+    .btn{
+      width:100%;
+      margin-top:14px;
+      padding:14px 14px;
+      border-radius:16px;
+      border:1.5px solid rgba(59,130,246,.28);
+      background:rgba(255,255,255,.95);
+      color:var(--primary2);
+      font-weight:900;
+      font-size:15px;
+      cursor:pointer;
+      transition: transform .12s ease, box-shadow .18s ease, background .15s ease;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+    }
+    .btn:hover{
+      background:rgba(59,130,246,.08);
+      box-shadow:0 10px 22px rgba(15,23,42,.08);
+    }
+    .btn:active{ transform:scale(.985); }
+
+    /* count pill */
+    .photo-count{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:10px;
+      padding:8px 12px;
+      background:rgba(34,197,94,.12);
+      border:1.5px solid rgba(34,197,94,.18);
+      border-radius:999px;
+      font-size:12px;
+      color:#166534;
+      font-weight:900;
+    }
+    .photo-limit{
+      margin-top:10px;
+      font-size:12px;
+      color:rgba(15,23,42,.62);
+      font-weight:800;
+    }
+
+    /* Previews */
+    .previews{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      overflow-x:auto;
+      padding-bottom:4px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .previews::-webkit-scrollbar{ display:none; }
+
+    .thumb{
+      width:104px;height:104px;
+      border-radius:18px;
+      overflow:hidden;
+      position:relative;
+      flex-shrink:0;
+      border:2px solid rgba(59,130,246,.14);
+      box-shadow:0 12px 24px rgba(15,23,42,.08);
+      background:#fff;
+    }
+    .thumb img{ width:100%; height:100%; object-fit:cover; }
+    .thumb button{
+      position:absolute;
+      top:8px; right:8px;
+      width:32px; height:32px;
+      border-radius:999px;
+      border:none;
+      background:rgba(239,68,68,.92);
+      color:#fff;
+      font-size:18px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 8px 18px rgba(239,68,68,.18);
+    }
+
+    /* Checkbox */
+    .checkbox-label{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      cursor:pointer;
+      font-weight:900;
+      line-height:1.4;
+    }
+    input[type="checkbox"]{
+      width:20px;height:20px;
+      accent-color:var(--primary2);
+      margin-top:2px;
+    }
+
+    /* Bottom CTA */
+    .bottom{
+      position:fixed;
+      left:0; right:0; bottom:0;
+      padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+      background:rgba(255,255,255,.88);
+      backdrop-filter: blur(16px);
+      border-top:1px solid rgba(31,41,55,.08);
+      z-index:100;
+    }
+    .bottom-content{ max-width:640px; margin:0 auto; }
+
+    .submit{
+      width:100%;
+      padding:16px 16px;
+      border-radius:18px;
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 55%, #60a5fa 100%);
+      color:#fff;
+      font-size:16px;
+      font-weight:900;
+      border:none;
+      cursor:pointer;
+      box-shadow:0 16px 30px rgba(37,99,235,.20);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      transition: transform .12s ease, box-shadow .18s ease, filter .18s ease;
+    }
+    .submit:not(:disabled):active{ transform:scale(.985); filter: brightness(0.98); }
+    .submit:disabled{
+      opacity:.45;
+      background:#cbd5e1;
+      box-shadow:none;
+      cursor:not-allowed;
+    }
+    .submit:not(:disabled){
+      box-shadow: 0 18px 34px rgba(37,99,235,.26);
+    }
+
+    /* Toast */
+    .toast{
+      margin-top:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      font-size:14px;
+      font-weight:900;
+      text-align:center;
+      background:rgba(34,197,94,.10);
+      border:1.5px solid rgba(34,197,94,.16);
+      color:#166534;
+      white-space:pre-wrap;
+      word-break:break-word;
+      animation: toastUp .22s ease-out both;
+    }
+    .toast.error{
+      background:rgba(239,68,68,.10);
+      border-color:rgba(239,68,68,.16);
+      color:#991b1b;
+    }
+
+    /* Spinner */
+    .spinner{
+      width:18px;height:18px;
+      border:2px solid rgba(255,255,255,.35);
+      border-top-color:#fff;
+      border-radius:50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    /* Animations */
+    @keyframes floatIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes toastUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Loading Modal */
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.35);
+      backdrop-filter: blur(6px);
+      z-index:9999;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .modal{
+      width:min(420px, 92vw);
+      background:rgba(255,255,255,.96);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:22px;
+      box-shadow:0 20px 50px rgba(15,23,42,.18);
+      padding:18px;
+      animation: floatIn .18s ease-out both;
+    }
+    .modal-title{
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:-.2px;
+    }
+    .modal-desc{
+      margin-top:8px;
+      font-size:13px;
+      color:var(--muted);
+      font-weight:700;
+      line-height:1.45;
+      white-space:pre-line;
+    }
+    .modal-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-top:14px;
+    }
+    .modal-spinner{
+      width:18px;height:18px;
+      border:2px solid rgba(37,99,235,.25);
+      border-top-color: var(--primary2);
+      border-radius:50%;
+      animation: spin .7s linear infinite;
+    }
+        /* Progress Bar (Loading Modal) */
+    .progress-wrap{
+      width:100%;
+      height:10px;
+      background:rgba(37,99,235,.12);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:14px;
+    }
+    .progress-bar{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#60a5fa,#2563eb,#60a5fa);
+      background-size:200% 100%;
+      animation: progressMove 1.2s linear infinite;
+      border-radius:999px;
+    }
+    
+    @keyframes progressMove{
+      from{ background-position:0% 0%; }
+      to{ background-position:200% 0%; }
+    }
+    .progress-text{
+      margin-top:10px;
+      font-size:12px;
+      color:#64748b;
+      font-weight:800;
+      text-align:right;
+    }
+
+    /* PC Block Screen */
+    .pcblock-wrap{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      position:relative;
+      z-index:2;
+    }
+    .pcblock-card{
+      width:min(420px, 92vw);
+      background:rgba(255,255,255,.96);
+      border:1px solid rgba(255,255,255,.75);
+      border-radius:22px;
+      box-shadow:0 20px 50px rgba(15,23,42,.14);
+      padding:26px 22px;
+      text-align:center;
+      animation: floatIn .22s ease-out both;
+    }
+    .pcblock-emoji{
+      font-size:44px;
+      margin-bottom:10px;
+    }
+    .pcblock-title{
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-.3px;
+    }
+    .pcblock-desc{
+      margin-top:10px;
+      font-size:14px;
+      color:#64748b;
+      font-weight:800;
+      line-height:1.55;
+      white-space:pre-line;
+    }
+
+    /* PC Block Toast */
+    .pc-toast{
+      position:fixed;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:10000;
+      background:rgba(15,23,42,.92);
+      color:#fff;
+      padding:12px 16px;
+      border-radius:14px;
+      font-size:14px;
+      font-weight:900;
+      box-shadow:0 14px 30px rgba(15,23,42,.35);
+      animation: toastDrop .28s ease-out both;
+      white-space:pre-line;
+      text-align:center;
+    }
+    @keyframes toastDrop{
+      from{ opacity:0; transform:translate(-50%,-8px); }
+      to{ opacity:1; transform:translate(-50%,0); }
+    }
+
+    @media (max-width:360px){
+      h1{ font-size:24px; }
+      .card{ padding:16px; }
+    }
+    @media (min-width:768px){
+      .screen{ padding:26px 22px calc(110px + env(safe-area-inset-bottom)); }
+    }
+  </style>
 </head>
 
-<body>
-<div id="root"></div>
+<body class="no-zoom">
+  <div class="apt-bg"></div>
+  <div id="root"></div>
 
-<script>
-const API_URL = "https://dawn-frost-9b1a.wlalsqqq.workers.dev/api/report";
-const MAX_PHOTOS = 5;
-const MAX_WIDTH = 1024;
-const JPEG_QUALITY = 0.72;
+  <script>
+    // ✅ 네 Cloudflare Worker API (정확한 주소로!)
+    const API_URL = "https://dawn-frost-9b1a.wlalsqqq.workers.dev/api/report";
 
-const {useState,useRef,useEffect,useMemo} = React;
+    // ✅ 속도/안정화 설정
+    const MAX_PHOTOS = 5;       // 최대 사진 장수
+    const MAX_WIDTH = 1024;     // 압축 최대 폭
+    const JPEG_QUALITY = 0.72;  // 압축 품질
 
-function isMobile(){
-  const ua = navigator.userAgent.toLowerCase();
-  const hasTouch = navigator.maxTouchPoints > 0;
-  return hasTouch && (ua.includes("android")||ua.includes("iphone")||ua.includes("ipad"));
-}
+    const {useState, useRef, useMemo, useEffect} = React;
 
-function App(){
-  const fileRef = useRef();
-
-  const [isMobileOk,setIsMobileOk] = useState(true);
-  const [showPcMsg,setShowPcMsg] = useState(true);
-
-  const [location,setLocation] = useState("");
-  const [plate,setPlate] = useState("");
-  const [phone,setPhone] = useState("");
-  const [note,setNote] = useState("");
-  const [files,setFiles] = useState([]);
-  const [agree,setAgree] = useState(false);
-
-  const [loading,setLoading] = useState(false);
-  const [progress,setProgress] = useState(0);
-
-  const [previews,setPreviews] = useState([]);
-
-  useEffect(()=>{
-    setIsMobileOk(isMobile());
-  },[]);
-
-  useEffect(()=>{
-    if(!isMobileOk){
-      const t=setTimeout(()=>setShowPcMsg(false),3000);
-      return ()=>clearTimeout(t);
+    function isMobileDevice() {
+      const ua = navigator.userAgent || "";
+      const isMobileUA = /Android|iPhone|iPad|iPod/i.test(ua);
+      const hasTouch = (navigator.maxTouchPoints > 0) || ("ontouchstart" in window);
+      return isMobileUA && hasTouch;
     }
-  },[isMobileOk]);
 
-  useEffect(()=>{
-    const urls = files.map(f=>URL.createObjectURL(f));
-    setPreviews(urls);
-    return ()=>urls.forEach(u=>URL.revokeObjectURL(u));
-  },[files]);
+    function App() {
+      const fileRef = useRef();
+      const [progress, setProgress] = useState(0);
 
-  if(!isMobileOk){
-    return React.createElement(React.Fragment,null,
-      showPcMsg && React.createElement("div",{className:"pc-toast"},
-        "⚠️ 모바일 전용 서비스입니다\nPC에서는 접수가 제한됩니다"
-      ),
-      React.createElement("div",{className:"pc-wrap"},
-        React.createElement("div",{className:"pc-card"},
-          React.createElement("div",{style:{fontSize:"42px"}}, "📱"),
-          React.createElement("h2",null,"모바일 전용 페이지"),
-          React.createElement("p",{className:"hint"},
-            "주차위반 제보는 휴대폰에서만 가능합니다."
+      // ✅ 훅들은 항상 동일 순서로 먼저 선언 (중요)
+      const [location, setLocation] = useState("");
+      const [plate, setPlate] = useState("");
+      const [phone, setPhone] = useState(""); // 선택값(저장은 숫자만)
+      const [note, setNote] = useState("");
+      const [files, setFiles] = useState([]);
+      const [agree, setAgree] = useState(false);
+      const [loading, setLoading] = useState(false);
+      const [toast, setToast] = useState("");
+      const [toastType, setToastType] = useState("success");
+
+      // PC 차단용 상태
+      const [isMobile, setIsMobile] = useState(true);
+      const [showPcMsg, setShowPcMsg] = useState(true);
+
+      // objectURL 누수 방지
+      const [previewUrls, setPreviewUrls] = useState([]);
+      useEffect(() => {
+        const urls = files.map(f => URL.createObjectURL(f));
+        setPreviewUrls(urls);
+        return () => urls.forEach(u => URL.revokeObjectURL(u));
+      }, [files]);
+
+      // 로딩 중 스크롤 잠금(모달 떠 있을 때)
+      useEffect(() => {
+        document.body.style.overflow = loading ? "hidden" : "";
+        return () => { document.body.style.overflow = ""; };
+      }, [loading]);
+
+      // 모바일 판별
+      useEffect(() => {
+        setIsMobile(isMobileDevice());
+      }, []);
+
+      // PC 메시지 자동 숨김(3초)
+      useEffect(() => {
+        if (!isMobile) {
+          setShowPcMsg(true);
+          const t = setTimeout(() => setShowPcMsg(false), 3000);
+          return () => clearTimeout(t);
+        }
+      }, [isMobile]);
+
+      // 유틸: 차량번호 공백 제거 + 영문 대문자
+      function normalizePlate(v) {
+        return (v || "").replace(/\s+/g, "").toUpperCase();
+      }
+
+      // 유틸: 연락처 숫자만 + 자동 하이픈 포맷(표시는 하이픈, 저장은 숫자만)
+      function formatPhone(v) {
+        const digits = (v || "").replace(/\D/g, "");
+
+        // 02 예외
+        if (digits.startsWith("02")) {
+          if (digits.length <= 2) return digits;
+          if (digits.length <= 5) return digits.replace(/(\d{2})(\d{1,3})/, "$1-$2");
+          if (digits.length <= 9) return digits.replace(/(\d{2})(\d{3})(\d{1,4})/, "$1-$2-$3");
+          return digits.slice(0, 10).replace(/(\d{2})(\d{4})(\d{4})/, "$1-$2-$3");
+        }
+
+        // 그 외(010/011/031 등)
+        if (digits.length <= 3) return digits;
+        if (digits.length <= 7) return digits.replace(/(\d{3})(\d{1,4})/, "$1-$2");
+        if (digits.length <= 11) return digits.replace(/(\d{3})(\d{4})(\d{1,4})/, "$1-$2-$3");
+
+        return digits.slice(0, 11).replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+      }
+
+      const canSubmit = useMemo(
+        () => location.trim() && plate.trim() && files.length > 0 && agree && !loading,
+        [location, plate, files, agree, loading]
+      );
+
+      function onFiles(e) {
+        const picked = Array.from(e.target.files || []);
+        if (!picked.length) return;
+
+        // 중복 방지 + 최대 장수 제한
+        setFiles(prev => {
+          const map = new Map(prev.map(f => [f.name+"_"+f.size+"_"+f.lastModified, f]));
+          for (const f of picked) map.set(f.name+"_"+f.size+"_"+f.lastModified, f);
+          return Array.from(map.values()).slice(0, MAX_PHOTOS);
+        });
+
+        e.target.value = "";
+      }
+
+      function remove(idx) {
+        setFiles(f => f.filter((_, i) => i !== idx));
+      }
+
+      // ✅ 사진 자동 압축(1024px, 0.72) + 병렬 처리용
+      async function fileToCompressedDataUrl(file, maxW = MAX_WIDTH, quality = JPEG_QUALITY) {
+        const img = await new Promise((resolve, reject) => {
+          const i = new Image();
+          i.onload = () => resolve(i);
+          i.onerror = reject;
+          i.src = URL.createObjectURL(file);
+        });
+
+        const w0 = img.naturalWidth || img.width;
+        const scale = Math.min(1, maxW / w0);
+        const w = Math.round(w0 * scale);
+        const h = Math.round((img.naturalHeight || img.height) * scale);
+
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+
+        try { URL.revokeObjectURL(img.src); } catch {}
+        return canvas.toDataURL("image/jpeg", quality);
+      }
+
+      async function submit() {
+        setToast("");
+        setLoading(true);
+        setProgress(10);
+      
+        try {
+          // ✅ 병렬 압축: 체감 속도 향상
+          setProgress(30);
+          const images = await Promise.all(
+            files.map(f => fileToCompressedDataUrl(f, MAX_WIDTH, JPEG_QUALITY))
+          );
+      
+          // 업로드 단계
+          setProgress(70);
+          const res = await fetch(API_URL, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+              location: location.trim(),
+              plate: normalizePlate(plate),
+              phone: phone.replace(/\D/g, ""),
+              note: note.trim(),
+              images,
+              ip: "-"
+            })
+          });
+      
+          setProgress(90);
+      
+          const text = await res.text().catch(()=> "");
+          let parsed = null;
+          try { parsed = JSON.parse(text); } catch {}
+      
+          if (!res.ok) throw new Error(text || ("HTTP " + res.status));
+          if (parsed && parsed.ok === false) {
+            throw new Error("GAS/Worker 오류\n" + JSON.stringify(parsed, null, 2));
+          }
+      
+          setProgress(100);
+      
+          setToastType("success");
+          setToast("✅ 접수가 완료되었습니다. 감사합니다!");
+          setLocation("");
+          setPlate("");
+          setPhone("");
+          setNote("");
+          setFiles([]);
+          setAgree(false);
+      
+          setTimeout(() => setToast(""), 3200);
+        } catch (e) {
+          setToastType("error");
+          setToast("❌ 제출에 실패했습니다.\n" + String(e && e.message ? e.message : e));
+        } finally {
+          // ✅ 0.4초 여운 주고 닫기
+          setTimeout(() => {
+            setLoading(false);
+            setProgress(0);
+          }, 400);
+        }
+      }
+
+
+      // ✅ PC 차단 화면 + 메시지
+      if (!isMobile) {
+        return React.createElement(React.Fragment, null,
+          showPcMsg && React.createElement("div", { className: "pc-toast" },
+            "⚠️ 모바일 전용 서비스입니다\nPC에서는 접수가 제한됩니다"
+          ),
+          React.createElement("div", { className: "pcblock-wrap" },
+            React.createElement("div", { className: "pcblock-card" },
+              React.createElement("div", { className: "pcblock-emoji" }, "📱"),
+              React.createElement("div", { className: "pcblock-title" }, "모바일 전용 페이지입니다"),
+              React.createElement("div", { className: "pcblock-desc" },
+                "주차위반 제보는 현장 촬영이 필요하여\n모바일 기기에서만 접수가 가능합니다.\n\n휴대폰으로 접속해 주세요."
+              )
+            )
+          )
+        );
+      }
+
+      return React.createElement("div", {className: "screen"},
+        React.createElement("div", {className: "header"},
+          React.createElement("h1", null, "🚫 라이브더센텀 주차위반 제보"),
+          React.createElement("div", {className: "subtitle"}, "우리 단지의 안전한 주차 문화를 함께 만들어가요")
+        ),
+
+        React.createElement("div", {className: "banner"},
+          React.createElement("div", {className: "banner-content"},
+            React.createElement("div", {className: "banner-title"}, "불법 주차 및 위반 사항을 제보해 주세요"),
+            React.createElement("div", {className: "banner-desc"}, "위반 사실이 명확히 확인될 수 있도록 증거사진을 제출해 주시기 바랍니다.")
+          )
+        ),
+
+        React.createElement("div", {className: "section"},
+          React.createElement("span", {className: "section-icon"}, "📋"),
+          "신고 내용"
+        ),
+
+        React.createElement("div", {className: "card"},
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📍"),
+            "위치"
+          ),
+          React.createElement("div", {className: "hint"}, "동·층·구역을 구체적으로 입력해 주세요"),
+          React.createElement("input", {
+            type: "text",
+            value: location,
+            onChange: e => setLocation(e.target.value),
+            placeholder: "예: 101동 B2층 A구역"
+          })
+        ),
+
+        React.createElement("div", {className: "card"},
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "🚗"),
+            "차량번호"
+          ),
+          React.createElement("div", {className: "hint"}, "공백은 자동 제거되고, 영문은 대문자로 자동 변환됩니다"),
+          React.createElement("input", {
+            type: "text",
+            value: plate,
+            onChange: e => setPlate(normalizePlate(e.target.value)),
+            placeholder: "예: 12가3456 / 12GA3456",
+            autoCapitalize: "characters"
+          })
+        ),
+
+        React.createElement("div", {className: "card"},
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📞"),
+            "연락처 (선택)"
+          ),
+          React.createElement("div", {className: "hint"}, "숫자만 입력해도 자동으로 010-1234-5678 형식으로 표시됩니다 (저장은 숫자만)"),
+          React.createElement("input", {
+            type: "text",
+            value: phone,
+            inputMode: "numeric",
+            onChange: e => setPhone(formatPhone(e.target.value)),
+            placeholder: "예: 01012345678"
+          })
+        ),
+
+        React.createElement("div", {className: "card"},
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📸"),
+            "사진"
+          ),
+          React.createElement("div", {className: "hint multiline"},
+            `번호판과 주차 위치가 함께 보이게 촬영해 주세요.\n자동 압축 전송 · 최대 ${MAX_PHOTOS}장`
+          ),
+          files.length > 0 && React.createElement("div", {className: "photo-count"},
+            `📎 사진 ${files.length}장 첨부됨`
+          ),
+          React.createElement("div", {className:"photo-limit"},
+            `• 권장: ${MAX_WIDTH}px / 품질 ${JPEG_QUALITY}로 전송 (더 빠르게 접수됩니다)`
+          ),
+
+          React.createElement("button", {
+            className: "btn",
+            type: "button",
+            onClick: () => fileRef.current && fileRef.current.click()
+          }, "사진 촬영/추가"),
+
+          React.createElement("input", {
+            ref: fileRef,
+            type: "file",
+            accept: "image/*",
+            multiple: true,
+            capture: "environment",
+            onChange: onFiles,
+            style: {display: "none"}
+          }),
+
+          previewUrls.length > 0 && React.createElement("div", {className: "previews"},
+            previewUrls.map((url, i) =>
+              React.createElement("div", {className: "thumb", key: i},
+                React.createElement("img", {src: url, alt: "preview"}),
+                React.createElement("button", {type:"button", onClick: () => remove(i)}, "×")
+              )
+            )
+          )
+        ),
+
+        React.createElement("div", {className: "section"},
+          React.createElement("span", {className: "section-icon"}, "📝"),
+          "추가 정보"
+        ),
+
+        React.createElement("div", {className: "card"},
+          React.createElement("label", null,
+            React.createElement("span", {className: "label-icon"}, "📝"),
+            "비고 (선택)"
+          ),
+          React.createElement("div", {className: "hint"}, "상습/반복 여부, 특이사항이 있으면 남겨 주세요"),
+          React.createElement("textarea", {
+            value: note,
+            onChange: e => setNote(e.target.value),
+            placeholder: "예: 3일 연속 같은 자리 주차, 통행 방해 등"
+          })
+        ),
+
+        React.createElement("div", {className: "card"},
+          React.createElement("label", {className: "checkbox-label"},
+            React.createElement("input", {
+              type: "checkbox",
+              checked: agree,
+              onChange: e => setAgree(e.target.checked)
+            }),
+            "증거 제공 및 처리에 동의합니다"
+          ),
+          React.createElement("div", {className: "hint", style: {marginTop: "10px"}},
+            `✓ 위치: ${location ? '입력됨' : '미입력'} | 차량번호: ${plate ? '입력됨' : '미입력'} | 사진: ${files.length}장 | 동의: ${agree ? '완료' : '필요'}`
+          )
+        ),
+
+        React.createElement("div", {className: "bottom"},
+          React.createElement("div", {className: "bottom-content"},
+            React.createElement("button", {
+              className: "submit",
+              disabled: !canSubmit,
+              onClick: submit
+            },
+              loading && React.createElement("div", {className: "spinner"}),
+              loading ? "제출 중..." : "제보 제출"
+            ),
+            toast && React.createElement(
+              "div",
+              { className: `toast ${toastType === 'error' ? 'error' : ''}` },
+              toast
+            )
+          )
+        ),
+
+        /* ✅ A안: 제출 중 팝업 모달 */
+        loading && React.createElement("div", { className: "modal-backdrop" },
+          React.createElement("div", { className: "modal" },
+            React.createElement("div", { className: "modal-title" }, "제출 중입니다…"),
+            React.createElement("div", { className: "modal-desc" },
+              "사진 업로드와 접수 처리 중입니다.\n잠시만 기다려 주세요."
+            ),
+            React.createElement("div", { className: "modal-row" },
+              React.createElement("div", { className: "modal-spinner" }),
+              React.createElement("div", { style:{fontWeight:900, color:"#334155"} }, "처리 중")
+            )
           )
         )
-      )
-    );
-  }
-
-  function normalizePlate(v){
-    return v.replace(/\s+/g,"").toUpperCase();
-  }
-  function formatPhone(v){
-    const d=v.replace(/\D/g,"");
-    if(d.length<=3) return d;
-    if(d.length<=7) return d.replace(/(\d{3})(\d+)/,"$1-$2");
-    return d.replace(/(\d{3})(\d{4})(\d+)/,"$1-$2-$3");
-  }
-
-  async function compress(file){
-    const img = await new Promise(res=>{
-      const i=new Image();
-      i.onload=()=>res(i);
-      i.src=URL.createObjectURL(file);
-    });
-    const scale=Math.min(1,MAX_WIDTH/img.width);
-    const c=document.createElement("canvas");
-    c.width=img.width*scale;
-    c.height=img.height*scale;
-    c.getContext("2d").drawImage(img,0,0,c.width,c.height);
-    return c.toDataURL("image/jpeg",JPEG_QUALITY);
-  }
-
-  async function submit(){
-    setLoading(true);
-    setProgress(20);
-
-    try{
-      const images = await Promise.all(files.map(f=>compress(f)));
-      setProgress(60);
-
-      await fetch(API_URL,{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          location,plate:normalizePlate(plate),
-          phone:phone.replace(/\D/g,""),
-          note,images,ip:"-"
-        })
-      });
-
-      setProgress(100);
-      alert("접수 완료");
-
-      setLocation("");setPlate("");setPhone("");
-      setNote("");setFiles([]);setAgree(false);
-    }catch(e){
-      alert("제출 실패");
-    }finally{
-      setTimeout(()=>{
-        setLoading(false);
-        setProgress(0);
-      },400);
+      );
     }
-  }
 
-  return React.createElement("div",{className:"screen"},
-    React.createElement("h1",null,"🚫 주차위반 제보"),
+    ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+  </script>
 
-    React.createElement("div",{className:"card"},
-      React.createElement("label",null,"위치"),
-      React.createElement("input",{value:location,onChange:e=>setLocation(e.target.value)})
-    ),
-
-    React.createElement("div",{className:"card"},
-      React.createElement("label",null,"차량번호"),
-      React.createElement("input",{value:plate,onChange:e=>setPlate(normalizePlate(e.target.value))})
-    ),
-
-    React.createElement("div",{className:"card"},
-      React.createElement("label",null,"연락처"),
-      React.createElement("input",{value:phone,onChange:e=>setPhone(formatPhone(e.target.value))})
-    ),
-
-    React.createElement("div",{className:"card"},
-      React.createElement("label",null,"사진"),
-      React.createElement("div",{className:"hint multiline"},
-        `자동 압축 전송\n최대 ${MAX_PHOTOS}장`
-      ),
-      React.createElement("button",{onClick:()=>fileRef.current.click()},"사진 추가"),
-      React.createElement("input",{type:"file",multiple:true,ref:fileRef,
-        style:{display:"none"},
-        onChange:e=>setFiles([...e.target.files].slice(0,MAX_PHOTOS))
-      }),
-      React.createElement("div",{className:"previews"},
-        previews.map((u,i)=>
-          React.createElement("div",{className:"thumb",key:i},
-            React.createElement("img",{src:u}),
-            React.createElement("button",{onClick:()=>setFiles(f=>f.filter((_,x)=>x!==i))},"×")
-          )
-        )
-      )
-    ),
-
-    React.createElement("div",{className:"card"},
-      React.createElement("label",null,
-        React.createElement("input",{type:"checkbox",checked:agree,onChange:e=>setAgree(e.target.checked)}),
-        " 증거 제공에 동의합니다"
-      )
-    ),
-
-    React.createElement("div",{className:"bottom"},
-      React.createElement("button",{disabled:!agree||files.length===0,onClick:submit},
-        "제보 제출"
-      )
-    ),
-
-    loading && React.createElement("div",{className:"modal-backdrop"},
-      React.createElement("div",{className:"modal"},
-        React.createElement("strong",null,"제보 접수 중"),
-        React.createElement("div",{className:"progress-wrap"},
-          React.createElement("div",{className:"progress-bar",style:{width:progress+"%"}})
-        )
-      )
-    )
-  );
-}
-
-ReactDOM.createRoot(document.getElementById("root"))
-  .render(React.createElement(App));
-</script>
+  <script>
+    // iOS/모바일 핀치 줌 방지(필요시)
+    (function disableZoom(){
+      document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, { passive:false });
+      document.addEventListener('gesturechange', function(e){ e.preventDefault(); }, { passive:false });
+      document.addEventListener('gestureend', function(e){ e.preventDefault(); }, { passive:false });
+      document.addEventListener('touchmove', function(e){
+        if (e.scale && e.scale !== 1) e.preventDefault();
+      }, { passive:false });
+    })();
+  </script>
 </body>
 </html>
