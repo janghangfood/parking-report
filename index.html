@@ -188,6 +188,7 @@
       font-weight:600;
       line-height:1.45;
     }
+    .hint.multiline{ white-space: pre-line; }
 
     /* Inputs */
     input[type="text"], textarea{
@@ -438,13 +439,6 @@
       animation: spin .7s linear infinite;
     }
 
-    @media (max-width:360px){
-      h1{ font-size:24px; }
-      .card{ padding:16px; }
-    }
-    @media (min-width:768px){
-      .screen{ padding:26px 22px calc(110px + env(safe-area-inset-bottom)); }
-    }
     /* PC Block Screen */
     .pcblock-wrap{
       min-height:100vh;
@@ -452,6 +446,8 @@
       align-items:center;
       justify-content:center;
       padding:24px;
+      position:relative;
+      z-index:2;
     }
     .pcblock-card{
       width:min(420px, 92vw);
@@ -480,7 +476,8 @@
       line-height:1.55;
       white-space:pre-line;
     }
-        /* PC Block Toast */
+
+    /* PC Block Toast */
     .pc-toast{
       position:fixed;
       top:18px;
@@ -498,13 +495,18 @@
       white-space:pre-line;
       text-align:center;
     }
+    @keyframes toastDrop{
+      from{ opacity:0; transform:translate(-50%,-8px); }
+      to{ opacity:1; transform:translate(-50%,0); }
+    }
 
-@keyframes toastDrop{
-  from{ opacity:0; transform:translate(-50%,-8px); }
-  to{ opacity:1; transform:translate(-50%,0); }
-}
-
-    
+    @media (max-width:360px){
+      h1{ font-size:24px; }
+      .card{ padding:16px; }
+    }
+    @media (min-width:768px){
+      .screen{ padding:26px 22px calc(110px + env(safe-area-inset-bottom)); }
+    }
   </style>
 </head>
 
@@ -518,84 +520,22 @@
 
     // ✅ 속도/안정화 설정
     const MAX_PHOTOS = 5;       // 최대 사진 장수
-    const MAX_WIDTH = 1024;     // 압축 최대 폭 (기존 1280 → 1024)
-    const JPEG_QUALITY = 0.72;  // 압축 품질 (기존 0.82 → 0.72)
+    const MAX_WIDTH = 1024;     // 압축 최대 폭
+    const JPEG_QUALITY = 0.72;  // 압축 품질
 
     const {useState, useRef, useMemo, useEffect} = React;
-    
-function isMobileDevice() {
-  const ua = navigator.userAgent || "";
-  const isMobileUA = /Android|iPhone|iPad|iPod/i.test(ua);
-  const hasTouch = (navigator.maxTouchPoints > 0) || ("ontouchstart" in window);
-  return isMobileUA && hasTouch;
-}
 
-function App() {
-  const fileRef = useRef();
-
-  // ✅ 기존 훅들(전부 먼저 선언!)
-  const [location, setLocation] = useState("");
-  const [plate, setPlate] = useState("");
-  const [phone, setPhone] = useState("");
-  const [note, setNote] = useState("");
-  const [files, setFiles] = useState([]);
-  const [agree, setAgree] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [toast, setToast] = useState("");
-  const [toastType, setToastType] = useState("success");
-
-  // ✅ PC차단용 훅도 여기서 선언
-  const [isMobile, setIsMobile] = useState(true);
-  const [showPcMsg, setShowPcMsg] = useState(true);
-
-  // objectURL 누수 방지(기존 코드 유지)
-  const [previewUrls, setPreviewUrls] = useState([]);
-  useEffect(() => {
-    const urls = files.map(f => URL.createObjectURL(f));
-    setPreviewUrls(urls);
-    return () => urls.forEach(u => URL.revokeObjectURL(u));
-  }, [files]);
-
-  // 로딩 중 스크롤 잠금(기존 코드 유지)
-  useEffect(() => {
-    document.body.style.overflow = loading ? "hidden" : "";
-    return () => { document.body.style.overflow = ""; };
-  }, [loading]);
-
-  // ✅ 모바일 판별(PC면 false)
-  useEffect(() => {
-    setIsMobile(isMobileDevice());
-  }, []);
-
-  // ✅ PC 메시지 3초 후 숨김(선택)
-  useEffect(() => {
-    if (!isMobile) {
-      setShowPcMsg(true);
-      const t = setTimeout(() => setShowPcMsg(false), 3000);
-      return () => clearTimeout(t);
+    function isMobileDevice() {
+      const ua = navigator.userAgent || "";
+      const isMobileUA = /Android|iPhone|iPad|iPod/i.test(ua);
+      const hasTouch = (navigator.maxTouchPoints > 0) || ("ontouchstart" in window);
+      return isMobileUA && hasTouch;
     }
-  }, [isMobile]);
 
-  // ✅ 여기서 PC 차단 return (훅 선언 이후라 안전)
-  if (!isMobile) {
-    return React.createElement(React.Fragment, null,
-      showPcMsg && React.createElement("div", { className: "pc-toast" },
-        "⚠️ 모바일 전용 서비스입니다\nPC에서는 접수가 제한됩니다"
-      ),
-      React.createElement("div", { className: "pcblock-wrap" },
-        React.createElement("div", { className: "pcblock-card" },
-          React.createElement("div", { className: "pcblock-emoji" }, "📱"),
-          React.createElement("div", { className: "pcblock-title" }, "모바일 전용 페이지입니다"),
-          React.createElement("div", { className: "pcblock-desc" },
-            "주차위반 제보는 현장 촬영이 필요하여\n모바일 기기에서만 접수가 가능합니다.\n\n휴대폰으로 접속해 주세요."
-          )
-        )
-      )
-    );
-  }
-  
+    function App() {
       const fileRef = useRef();
 
+      // ✅ 훅들은 항상 동일 순서로 먼저 선언 (중요)
       const [location, setLocation] = useState("");
       const [plate, setPlate] = useState("");
       const [phone, setPhone] = useState(""); // 선택값(저장은 숫자만)
@@ -605,6 +545,10 @@ function App() {
       const [loading, setLoading] = useState(false);
       const [toast, setToast] = useState("");
       const [toastType, setToastType] = useState("success");
+
+      // PC 차단용 상태
+      const [isMobile, setIsMobile] = useState(true);
+      const [showPcMsg, setShowPcMsg] = useState(true);
 
       // objectURL 누수 방지
       const [previewUrls, setPreviewUrls] = useState([]);
@@ -619,6 +563,20 @@ function App() {
         document.body.style.overflow = loading ? "hidden" : "";
         return () => { document.body.style.overflow = ""; };
       }, [loading]);
+
+      // 모바일 판별
+      useEffect(() => {
+        setIsMobile(isMobileDevice());
+      }, []);
+
+      // PC 메시지 자동 숨김(3초)
+      useEffect(() => {
+        if (!isMobile) {
+          setShowPcMsg(true);
+          const t = setTimeout(() => setShowPcMsg(false), 3000);
+          return () => clearTimeout(t);
+        }
+      }, [isMobile]);
 
       // 유틸: 차량번호 공백 제거 + 영문 대문자
       function normalizePlate(v) {
@@ -668,7 +626,7 @@ function App() {
         setFiles(f => f.filter((_, i) => i !== idx));
       }
 
-      // ✅ 사진 용량 문제 방지: 자동 압축(기본 1024px, JPEG 0.72)  + 빠르게
+      // ✅ 사진 자동 압축(1024px, 0.72) + 병렬 처리용
       async function fileToCompressedDataUrl(file, maxW = MAX_WIDTH, quality = JPEG_QUALITY) {
         const img = await new Promise((resolve, reject) => {
           const i = new Image();
@@ -678,10 +636,9 @@ function App() {
         });
 
         const w0 = img.naturalWidth || img.width;
-        const h0 = img.naturalHeight || img.height;
         const scale = Math.min(1, maxW / w0);
         const w = Math.round(w0 * scale);
-        const h = Math.round(h0 * scale);
+        const h = Math.round((img.naturalHeight || img.height) * scale);
 
         const canvas = document.createElement("canvas");
         canvas.width = w;
@@ -698,12 +655,11 @@ function App() {
         setLoading(true);
 
         try {
-          // ✅ 병렬 압축: 체감 속도 향상 (순차 for-await 제거)
+          // ✅ 병렬 압축: 체감 속도 향상
           const images = await Promise.all(
             files.map(f => fileToCompressedDataUrl(f, MAX_WIDTH, JPEG_QUALITY))
           );
 
-          // ✅ Worker에 "순수 데이터"만 전송 (Worker가 {action,data}로 감싸 GAS로 전달)
           const res = await fetch(API_URL, {
             method: "POST",
             headers: {"Content-Type": "application/json"},
@@ -744,6 +700,24 @@ function App() {
         }
       }
 
+      // ✅ PC 차단 화면 + 메시지
+      if (!isMobile) {
+        return React.createElement(React.Fragment, null,
+          showPcMsg && React.createElement("div", { className: "pc-toast" },
+            "⚠️ 모바일 전용 서비스입니다\nPC에서는 접수가 제한됩니다"
+          ),
+          React.createElement("div", { className: "pcblock-wrap" },
+            React.createElement("div", { className: "pcblock-card" },
+              React.createElement("div", { className: "pcblock-emoji" }, "📱"),
+              React.createElement("div", { className: "pcblock-title" }, "모바일 전용 페이지입니다"),
+              React.createElement("div", { className: "pcblock-desc" },
+                "주차위반 제보는 현장 촬영이 필요하여\n모바일 기기에서만 접수가 가능합니다.\n\n휴대폰으로 접속해 주세요."
+              )
+            )
+          )
+        );
+      }
+
       return React.createElement("div", {className: "screen"},
         React.createElement("div", {className: "header"},
           React.createElement("h1", null, "🚫 라이브더센텀 주차위반 제보"),
@@ -781,12 +755,12 @@ function App() {
             React.createElement("span", {className: "label-icon"}, "🚗"),
             "차량번호"
           ),
-          React.createElement("div", {className: "hint"}, "차량번호를 입력해 주세요"),
+          React.createElement("div", {className: "hint"}, "공백은 자동 제거되고, 영문은 대문자로 자동 변환됩니다"),
           React.createElement("input", {
             type: "text",
             value: plate,
             onChange: e => setPlate(normalizePlate(e.target.value)),
-            placeholder: "예: 12가3456",
+            placeholder: "예: 12가3456 / 12GA3456",
             autoCapitalize: "characters"
           })
         ),
@@ -796,7 +770,7 @@ function App() {
             React.createElement("span", {className: "label-icon"}, "📞"),
             "연락처 (선택)"
           ),
-          React.createElement("div", {className: "hint"}, "숫자만 입력해도 자동으로 010-1234-5678 형식으로 표시됩니다"),
+          React.createElement("div", {className: "hint"}, "숫자만 입력해도 자동으로 010-1234-5678 형식으로 표시됩니다 (저장은 숫자만)"),
           React.createElement("input", {
             type: "text",
             value: phone,
@@ -811,18 +785,14 @@ function App() {
             React.createElement("span", {className: "label-icon"}, "📸"),
             "사진"
           ),
-        React.createElement(
-          "div",
-          { className: "hint" },
-          "번호판과 주차 위치가 함께 보이게 촬영해 주세요",
-          React.createElement("br"),
-          `자동 압축 전송 · 최대 ${MAX_PHOTOS}장`
-        ),
+          React.createElement("div", {className: "hint multiline"},
+            `번호판과 주차 위치가 함께 보이게 촬영해 주세요.\n자동 압축 전송 · 최대 ${MAX_PHOTOS}장`
+          ),
           files.length > 0 && React.createElement("div", {className: "photo-count"},
             `📎 사진 ${files.length}장 첨부됨`
           ),
           React.createElement("div", {className:"photo-limit"},
-           
+            `• 권장: ${MAX_WIDTH}px / 품질 ${JPEG_QUALITY}로 전송 (더 빠르게 접수됩니다)`
           ),
 
           React.createElement("button", {
@@ -865,7 +835,7 @@ function App() {
           React.createElement("textarea", {
             value: note,
             onChange: e => setNote(e.target.value),
-            placeholder: "예: 통행 방해, 상습 주차 등"
+            placeholder: "예: 3일 연속 같은 자리 주차, 통행 방해 등"
           })
         ),
 
